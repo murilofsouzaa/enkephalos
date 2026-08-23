@@ -40,14 +40,14 @@ const Homepage = () => {
     }
 
     return ( 
-        <main className="flex justify-center items-center bg-(--bg-color) h-screen">
+        <main className="flex justify-center items-center">
             <div
                 onClick={() => {
                     setIsFirstTime(false);
                     setIsActive((prev) => !prev)
                 }}
                 className="timer-subcontainer flex flex-col justify-center items-center bg-(--circle-color) border-10 border-(--timer-stroke) 
-                h-150 w-150 rounded-[100%] hover:scale-[0.98] hover:cursor-pointer transition-all">
+                h-150 w-150 rounded-[100%] hover:scale-[0.98] hover:cursor-pointer transition-all mt-20">
                 <div className="text-white text-9xl font-bold">
                     {isFirstTime ? 
                         <span>25:00</span>

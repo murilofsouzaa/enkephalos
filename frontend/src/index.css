@@ -5,3 +5,7 @@
   --bg-color: #30323D;
   --timer-stroke: #666666; 
 }
+
+body{
+  background: var(--bg-color);
+}

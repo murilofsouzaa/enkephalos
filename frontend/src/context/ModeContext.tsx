@@ -5,6 +5,7 @@ export interface IMode {
     setMode: (mode: string) => void;
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export const ModeContext = createContext<IMode | undefined>(undefined);
 
 export function ModeProvider({ children }: { children: ReactNode }) {
