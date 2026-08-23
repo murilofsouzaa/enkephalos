@@ -1,5 +1,5 @@
 import {useState, useEffect} from 'react'
-import {Play, Pause} from 'lucide-react'
+import {Play, Pause, RotateCcw} from 'lucide-react'
 
 const Homepage = () => {
 
@@ -33,6 +33,12 @@ const Homepage = () => {
         }
     }, [isActive]);
 
+    const handleRestart = () =>{
+        setIsFirstTime(true);
+        setMinutes(25)
+        setSeconds(0)
+    }
+
     return ( 
         <main className="flex justify-center items-center bg-(--bg-color) h-screen">
             <button
@@ -50,16 +56,25 @@ const Homepage = () => {
                         <span>{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
                     }
                 </div>
-            <button 
-                type="button"
-                className={`${isFirstTime && "hidden"} font-semibold text-white py-2 px-8 cursor-pointer`}
-                >{!isActive? <Play className="w-auto h-8"/> : <Pause  className="w-auto h-8"/>}
-            </button>
-            <button 
-                type="button"
-                className={`${!isFirstTime && "hidden"} font-semibold text-2xl text-white py-2 px-8 cursor-pointer`}
-                >{!isActive && "CLICK TO START"}
-            </button>
+                <div className="flex gap-5">
+                    <button
+                        type="button"
+                        className={`${isFirstTime && "hidden"} font-semibold text-white cursor-pointer`}
+                        >{!isActive? <Play className="w-auto h-8"/> : <Pause  className="w-auto h-8"/>}
+                    </button>
+                    <button
+                        type="button"
+                        className={`${!isFirstTime && "hidden"} font-semibold text-2xl text-white cursor-pointer`}
+                        >{!isActive && "CLICK TO START"}
+                    </button>
+                    <button
+                        type="button"
+                        className={`${isFirstTime && "hidden"} z-5 font-semibold text-2xl text-white cursor-pointer`}
+                        ><RotateCcw 
+                        onClick={handleRestart}
+                        className="w-auto h-8"/>
+                    </button>
+                </div>
             </button>
         </main>
      );
