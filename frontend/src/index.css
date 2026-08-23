@@ -1,7 +1,9 @@
 @import "tailwindcss";
 
 :root{
-  --circle-color: #fac107;
+  --pomodoro-circle-color: #fac107;
+  --short-break-circle-color: #3090d4;
+  --long-break-circle-color: #d24141;
   --bg-color: #30323D;
   --timer-stroke: #666666; 
 }
