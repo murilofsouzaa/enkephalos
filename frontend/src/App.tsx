@@ -1,15 +1,16 @@
 import './App.css'
 import Homepage from './components/Homepage/Homepage'
 import Header from './components/Header/Header'
+import { ModeProvider } from './context/ModeContext';
 
 
 function App() {
 
   return (
-    <>
-     <Header></Header>
-     <Homepage></Homepage>
-    </>
+     <ModeProvider>
+       <Header></Header>
+       <Homepage></Homepage>
+     </ModeProvider>
   )
 }
 

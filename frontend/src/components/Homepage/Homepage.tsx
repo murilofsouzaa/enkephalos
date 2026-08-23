@@ -1,8 +1,7 @@
-import {useState, useEffect} from 'react'
+import React, {useState, useEffect} from 'react'
 import {Play, Pause, RotateCcw} from 'lucide-react'
 
 const Homepage = () => {
-
     const [minutes, setMinutes] = useState<number>(24);
     const [seconds, setSeconds] = useState<number>(59);
     const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
@@ -32,7 +31,7 @@ const Homepage = () => {
         }
     }, [isActive]);
 
-    const handleRestart = (e) => {
+    const handleRestart = (e:React.MouseEvent) => {
         e.stopPropagation();
         setIsActive(false);
         setIsFirstTime(true);
