@@ -3,7 +3,7 @@ import {Play, Pause, RotateCcw} from 'lucide-react'
 
 const Homepage = () => {
 
-    const [minutes, setMinutes] = useState<number>(25);
+    const [minutes, setMinutes] = useState<number>(24);
     const [seconds, setSeconds] = useState<number>(59);
     const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
     const [isActive, setIsActive] = useState<boolean>(false);
@@ -14,35 +14,35 @@ const Homepage = () => {
                 setSeconds((prev):number => {
                     if(prev > 0){
                       return prev - 1;  
-                    }else{
-                        setMinutes((prev):number => {
-                            if(prev > 0){
-                                setSeconds(59);
-                                return prev - 1;
-                            }else{
-                                return 0;
-                            }
-                        })
-                        setIsActive((prev) => !prev)
-                        return 0;
                     }
-                } 
+                    setMinutes((prev):number => {
+                        if(prev > 0){
+                            setSeconds(59);
+                            return prev - 1;
+                        }else{
+                            return 0;
+                        }
+                    })
+                    setIsActive((prev) => !prev)
+                    return 0;
+                    } 
             )
             }, 1000)
             return () => clearInterval(timerId);
         }
     }, [isActive]);
 
-    const handleRestart = () =>{
+    const handleRestart = (e) => {
+        e.stopPropagation();
+        setIsActive(false);
         setIsFirstTime(true);
-        setMinutes(25)
-        setSeconds(0)
+        setMinutes(24)
+        setSeconds(59)
     }
 
     return ( 
         <main className="flex justify-center items-center bg-(--bg-color) h-screen">
-            <button
-                type="button"
+            <div
                 onClick={() => {
                     setIsFirstTime(false);
                     setIsActive((prev) => !prev)
@@ -69,13 +69,13 @@ const Homepage = () => {
                     </button>
                     <button
                         type="button"
-                        className={`${isFirstTime && "hidden"} z-5 font-semibold text-2xl text-white cursor-pointer`}
+                        className={`${isFirstTime && "hidden"} z-20 font-semibold text-2xl text-white cursor-pointer`}
                         ><RotateCcw 
                         onClick={handleRestart}
                         className="w-auto h-8"/>
                     </button>
                 </div>
-            </button>
+            </div>
         </main>
      );
 }
