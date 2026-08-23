@@ -1,7 +1,7 @@
+@import "tailwindcss";
+
 :root{
-  --main-color: #5386E4;
-  --secondary-color: #4C4B63;
-  --third-color: #949396; 
-  --fourth-color: #ABA8B2;  
-  --fifth-color: #C3C3C3;  
+  --circle-color: #fac107;
+  --bg-color: #30323D;
+  --timer-stroke: #666666; 
 }
