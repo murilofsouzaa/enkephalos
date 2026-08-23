@@ -1,4 +1,5 @@
 import {useState, useEffect} from 'react'
+import {Play, Pause} from 'lucide-react'
 
 const Homepage = () => {
 
@@ -33,7 +34,7 @@ const Homepage = () => {
     }, [isActive]);
 
     return ( 
-        <div className="flex justify-center items-center bg-(--bg-color) h-screen">
+        <main className="flex justify-center items-center bg-(--bg-color) h-screen">
             <button
                 type="button"
                 onClick={() => {
@@ -51,11 +52,16 @@ const Homepage = () => {
                 </div>
             <button 
                 type="button"
-                className="font-semibold text-2xl text-white py-2 px-8 cursor-pointer"
-                >{!isActive? "START" : "PAUSE"}
+                className={`${isFirstTime && "hidden"} font-semibold text-white py-2 px-8 cursor-pointer`}
+                >{!isActive? <Play className="w-auto h-8"/> : <Pause  className="w-auto h-8"/>}
+            </button>
+            <button 
+                type="button"
+                className={`${!isFirstTime && "hidden"} font-semibold text-2xl text-white py-2 px-8 cursor-pointer`}
+                >{!isActive && "CLICK TO START"}
             </button>
             </button>
-        </div>
+        </main>
      );
 }
  
