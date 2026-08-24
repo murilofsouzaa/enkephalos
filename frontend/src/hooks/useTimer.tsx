@@ -1,7 +1,18 @@
 import {useState} from 'react'
 
-export function useTimer(){
-    const TOTAL_SECONDS = 30 * 60;
+export type TimerMode = 'pomodoro' | 'short_break' | 'long_break'
+
+
+export function useTimer(mode:TimerMode = 'pomodoro'){
+
+    const times =  {
+        pomodoro: 25 * 60,
+        short_break: 5 * 60,
+        long_break: 15 * 60
+    }
+
+    const TOTAL_SECONDS = times[mode]
+
     const [timeLeft, setTimeLeft] = useState<number>(TOTAL_SECONDS);
     const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
     const [isActive, setIsActive] = useState<boolean>(false);

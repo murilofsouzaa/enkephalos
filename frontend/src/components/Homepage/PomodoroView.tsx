@@ -3,9 +3,20 @@ import { Play, Pause, RotateCcw } from 'lucide-react';
 import {useTimer} from '../../hooks/useTimer'
 import clickSound from '../../../public/irinairinafomicheva-start-13691.mp3'
 
-const LongBreakView = () => {
+const PomodoroView = () => {
 
-    const {isActive, setIsActive, isFirstTime, setIsFirstTime, timeLeft, setTimeLeft, minutes, seconds, waterPercentage, TOTAL_SECONDS} = useTimer();
+    const {
+        isActive,
+        setIsActive,
+        isFirstTime,
+        setIsFirstTime,
+        timeLeft,
+        setTimeLeft,
+        minutes,
+        seconds,
+        waterPercentage,
+        TOTAL_SECONDS
+        } = useTimer('pomodoro');
 
         useEffect(() => {
         let timerId: NodeJS.Timeout;
@@ -49,14 +60,14 @@ const LongBreakView = () => {
                 <div 
                     className="absolute left-0 w-full h-full z-0 transition-all duration-1000 ease-linear"
                     style={{ top: `${100 - waterPercentage}%` }}>
-                        <div className="absolute top-0 left-[-50%] w-[200%] h-[200%] bg-(--long-break-circle-color) opacity-50 rounded-[45%] animate-[spin_10s_linear_infinite]"></div>  
-                        <div className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] bg-(--long-break-circle-color) rounded-[40%] animate-[spin_7s_linear_infinite]"></div>
+                        <div className="absolute top-0 left-[-50%] w-[200%] h-[200%] bg-(--pomodoro-circle-color) opacity-50 rounded-[45%] animate-[spin_10s_linear_infinite]"></div>  
+                        <div className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] bg-(--pomodoro-circle-color) rounded-[40%] animate-[spin_7s_linear_infinite]"></div>
                 </div>
 
                 <div className="z-10 flex flex-col justify-center items-center">
                     <div className="text-white text-9xl font-bold">
                         {isFirstTime ? 
-                            <span className="font-lexend drop-shadow-md">30:00</span>
+                            <span className="font-lexend drop-shadow-md">25:00</span>
                         :
                             <span className="font-lexend drop-shadow-md">{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
                         }
@@ -89,4 +100,4 @@ const LongBreakView = () => {
      );
 };
  
-export default LongBreakView;
+export default PomodoroView;

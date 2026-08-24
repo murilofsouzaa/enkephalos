@@ -5,7 +5,18 @@ import clickSound from '../../../public/irinairinafomicheva-start-13691.mp3'
 
 const LongBreakView = () => {
 
-    const {isActive, setIsActive, isFirstTime, setIsFirstTime, timeLeft, setTimeLeft, minutes, seconds, waterPercentage, TOTAL_SECONDS} = useTimer();
+    const {
+        isActive,
+        setIsActive,
+        isFirstTime,
+        setIsFirstTime,
+        timeLeft,
+        setTimeLeft,
+        minutes,
+        seconds,
+        waterPercentage,
+        TOTAL_SECONDS
+        } = useTimer('long_break');
 
         useEffect(() => {
         let timerId: NodeJS.Timeout;
@@ -56,7 +67,7 @@ const LongBreakView = () => {
                 <div className="z-10 flex flex-col justify-center items-center">
                     <div className="text-white text-9xl font-bold">
                         {isFirstTime ? 
-                            <span className="font-lexend drop-shadow-md">30:00</span>
+                            <span className="font-lexend drop-shadow-md">15:00</span>
                         :
                             <span className="font-lexend drop-shadow-md">{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
                         }
