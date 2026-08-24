@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
 import Button from '../../ui/Button';
 import { useTimer } from '../../hooks/useTimer';
-import timerStart from '../../../public/timer-start.mp3'
-import pausedSound from '../../../public/timer-paused.mp3'
-
-
-
+import timerStart from '/timer-start.mp3'
+import pausedSound from '/timer-paused.mp3'
+import timerEnded from '/timer-ended.mp3'
 
 const ShortBreakView = () => {
     const {
@@ -30,6 +28,11 @@ const ShortBreakView = () => {
             }, 1000);
         } else if (timeLeft === 0) {
             setIsActive(false);
+        }
+
+        if(timeLeft == 0){
+            const audio = new Audio(timerEnded);
+            audio.play();
         }
         
         return () => clearInterval(timerId);
