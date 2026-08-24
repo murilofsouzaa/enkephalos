@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Play, Pause, RotateCcw } from 'lucide-react';
+import clickSound from '../../../public/floraphonic-analog-appliance-button-3-185278.mp3'
 
 const PomodoroView = () => {
     const TOTAL_SECONDS = 25 * 60;
@@ -22,10 +23,10 @@ const PomodoroView = () => {
         } else if (timeLeft === 0) {
             setIsActive(false);
         }
-
+        
         return () => clearInterval(timerId);
     }, [isActive, timeLeft]);
-
+    
     const handleRestart = (e: React.MouseEvent) => {
         e.stopPropagation();
         setIsActive(false);
@@ -33,10 +34,18 @@ const PomodoroView = () => {
         setTimeLeft(TOTAL_SECONDS);
     };
 
+    const handleClick = () =>{
+        const audio = new Audio(clickSound);
+        audio.currentTime = 0;
+        audio.play()
+    }
+
     return ( 
         <main className="flex justify-center items-center">
             <div
                 onClick={() => {
+                    handleClick();
+
                     if (isFirstTime) {
                         setIsFirstTime(false);
                     }
@@ -53,36 +62,7 @@ const PomodoroView = () => {
                     <div className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] bg-(--pomodoro-circle-color) rounded-[40%] animate-[spin_7s_linear_infinite]"></div>
                 </div>
 
-                <div className="z-10 flex flex-col justify-center items-center">
-                    <div className="text-white text-9xl font-bold">
-                        {isFirstTime ? 
-                            <span className="font-lexend drop-shadow-md">25:00</span>
-                        :
-                            <span className="font-lexend drop-shadow-md">{minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}</span>
-                        }
-                    </div>
-                    <div className="flex gap-5 mt-2">
-                        <button
-                            type="button"
-                            className={`${isFirstTime && "hidden"} font-semibold text-white cursor-pointer drop-shadow-md`}
-                        >
-                            {!isActive ? <Play className="w-auto h-8"/> : <Pause className="w-auto h-8"/>}
-                        </button>
-                        <button
-                            type="button"
-                            className={`${!isFirstTime && "hidden"} font-semibold text-2xl text-white cursor-pointer drop-shadow-md`}
-                        >
-                            {!isActive && "CLICK TO START"}
-                        </button>
-                        <button
-                            type="button"
-                            className={`${isFirstTime && "hidden"} z-20 font-semibold text-2xl text-white cursor-pointer drop-shadow-md`}
-                            onClick={handleRestart}
-                        >
-                            <RotateCcw className="w-auto h-8"/>
-                        </button>
-                    </div>
-                </div>
+                
             </div>
         </main>
      );
