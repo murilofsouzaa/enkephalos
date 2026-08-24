@@ -2,7 +2,7 @@ import { useMode} from '../../hooks/useMode';
 
 const Header = () => {
 
-    const {setMode, setIsActive} = useMode(); 
+    const {setMode} = useMode(); 
 
     return ( 
         <header className="bg-(--bg-color) flex justify-center items-center h-30 w-auto">

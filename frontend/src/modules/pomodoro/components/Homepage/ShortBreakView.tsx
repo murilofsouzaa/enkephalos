@@ -5,9 +5,7 @@ import timerStart from '/timer-start.mp3'
 import pausedSound from '/timer-paused.mp3'
 import timerEnded from '/timer-ended.mp3'
 
-
-
-const LongBreakView = () => {
+const ShortBreakView = () => {
     const {
         TOTAL_SECONDS,
         isActive,
@@ -19,10 +17,10 @@ const LongBreakView = () => {
         minutes,
         seconds,
         waterPercentage,
-    } = useTimer('long_break');
+    } = useTimer('short_break');
 
     useEffect(() => {
-        let timerId: NodeJS.Timeout;
+        let timerId: ReturnType<typeof setInterval>;
         
         if (isActive && timeLeft > 0) {
             timerId = setInterval(() => {
@@ -37,10 +35,9 @@ const LongBreakView = () => {
             audio.play();
         }
         
-        return () => clearInterval(timerId);
+        return () => clearInterval(timerId as unknown as number);
     }, [isActive, timeLeft, setTimeLeft, setIsActive]);
 
-    
     const handleStartClick = () => {
         const audio = new Audio(timerStart);
         audio.currentTime = 0;
@@ -49,9 +46,11 @@ const LongBreakView = () => {
 
     const handlePauseButtonAudio = () =>{
         const audio = new Audio(pausedSound);
+        audio.currentTime = 0;
         audio.play();
     }
 
+    
     return ( 
         <main className="flex justify-center items-center">
             <div
@@ -70,8 +69,8 @@ const LongBreakView = () => {
                 <div 
                     className="absolute left-0 w-full h-full z-0 transition-all duration-1000 ease-linear"
                     style={{ top: `${100 - waterPercentage}%` }}>
-                        <div className="absolute top-0 left-[-50%] w-[200%] h-[200%] bg-(--long-break-circle-color) opacity-50 rounded-[45%] animate-[spin_10s_linear_infinite]"></div>  
-                        <div className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] bg-(--long-break-circle-color) rounded-[40%] animate-[spin_7s_linear_infinite]"></div>
+                        <div className="absolute top-0 left-[-50%] w-[200%] h-[200%] bg-(--short-break-circle-color) opacity-50 rounded-[45%] animate-[spin_10s_linear_infinite]"></div>  
+                        <div className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] bg-(--short-break-circle-color) rounded-[40%] animate-[spin_7s_linear_infinite]"></div>
                 </div>
 
                 <Button 
@@ -89,4 +88,4 @@ const LongBreakView = () => {
      );
 };
  
-export default LongBreakView;
+export default ShortBreakView;

@@ -22,7 +22,7 @@ const PomodoroView = () => {
     } = useTimer('pomodoro');
 
     useEffect(() => {
-        let timerId: NodeJS.Timeout;
+        let timerId: ReturnType<typeof setInterval>;
         
         if (isActive && timeLeft > 0) {
             timerId = setInterval(() => {
@@ -37,7 +37,7 @@ const PomodoroView = () => {
             audio.play();
         }
         
-        return () => clearInterval(timerId);
+        return () => clearInterval(timerId as unknown as number);
     }, [isActive, timeLeft, setTimeLeft, setIsActive]);
 
 

@@ -1,6 +1,7 @@
 import { Play, Pause, RotateCcw } from 'lucide-react';
-import restartSound from '../../public/time-restart.mp3'
-import pausedSound from '../../public/timer-paused.mp3'
+
+const restartSound = new URL('/time-restart.mp3', import.meta.url).href;
+const pausedSound = new URL('/timer-paused.mp3', import.meta.url).href;
 
 interface ButtonProps {
     isFirstTime: boolean;
