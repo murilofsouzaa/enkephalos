@@ -1,4 +1,5 @@
-import { useState, type FC } from 'react';
+import { useState, useEffect, type FC } from 'react';
+import { createPortal } from 'react-dom';
 import {
   X,
   Settings,
@@ -60,6 +61,18 @@ export const PomodoroSettingsDrawer: FC = () => {
 
   const currentSong = AVAILABLE_SONGS.find((s) => s.url === selectedSongUrl);
 
+  // Close drawer on Escape key
+  useEffect(() => {
+    if (!isSettingsOpen) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setIsSettingsOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSettingsOpen, setIsSettingsOpen]);
+
   return (
     <>
       {/* Settings Floating Trigger Button on the Right Side */}
@@ -73,20 +86,24 @@ export const PomodoroSettingsDrawer: FC = () => {
         <Settings className="w-4.5 h-4.5 sm:w-5 sm:h-5 transition-transform duration-500 group-hover:rotate-90" />
       </button>
 
-      {/* Backdrop overlay */}
-      {isSettingsOpen && (
-        <div
-          onClick={() => setIsSettingsOpen(false)}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity animate-in fade-in duration-200"
-        />
-      )}
+      {/* Portal overlay and drawer to document.body so it covers the entire screen, header and all */}
+      {createPortal(
+        <>
+          {/* Backdrop overlay - darkens with blur covering whole viewport including sticky header */}
+          {isSettingsOpen && (
+            <div
+              onClick={() => setIsSettingsOpen(false)}
+              className="fixed inset-0 bg-black/75 backdrop-blur-md z-[9990] transition-all duration-300 animate-in fade-in"
+              style={{ willChange: 'opacity, backdrop-filter' }}
+            />
+          )}
 
-      {/* Drawer Panel */}
-      <div
-        className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] z-50 shadow-2xl border-l border-[var(--border-subtle,#26211e)] flex flex-col transform transition-transform duration-300 ease-in-out ${
-          isSettingsOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-      >
+          {/* Drawer Panel */}
+          <div
+            className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] z-[9999] shadow-2xl border-l border-[var(--border-subtle,#26211e)] flex flex-col transform transition-all duration-300 ease-in-out ${
+              isSettingsOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-full opacity-0 pointer-events-none'
+            }`}
+          >
         {/* Drawer Header - Clean typography without icon clutter */}
         <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)]/70">
           <div>
@@ -901,6 +918,9 @@ export const PomodoroSettingsDrawer: FC = () => {
         </div>
 
       </div>
+        </>,
+        document.body
+      )}
     </>
   );
 };
