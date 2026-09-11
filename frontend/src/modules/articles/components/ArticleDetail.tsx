@@ -3,6 +3,9 @@ import { useParams, Link } from 'react-router-dom';
 import { ArrowLeft, Check, ChevronUp, Lock, Mail, Copy, X } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
+import 'katex/dist/katex.min.css';
 import { ARTICLES_DATA } from '../data/articlesData';
 
 /**
@@ -284,7 +287,8 @@ export const ArticleDetail: FC = () => {
                 </div>
               ) : (
                 <ReactMarkdown
-                  remarkPlugins={[remarkGfm]}
+                  remarkPlugins={[remarkGfm, remarkMath]}
+                  rehypePlugins={[rehypeKatex]}
                   components={{
                     h1: ({ children }) => {
                       const text = String(children);
@@ -368,19 +372,51 @@ export const ArticleDetail: FC = () => {
                       );
                     },
                     ul: ({ children }) => (
-                      <ul className="list-disc list-inside my-4 space-y-2 text-[var(--text-muted,#9e9589)] pl-2">
+                      <ul className="list-disc list-outside my-5 space-y-2.5 text-[var(--text-muted,#9e9589)] pl-6 marker:text-[var(--accent-color,#f59e0b)]">
                         {children}
                       </ul>
                     ),
                     ol: ({ children }) => (
-                      <ol className="list-decimal list-inside my-4 space-y-2 text-[var(--text-muted,#9e9589)] pl-2">
+                      <ol className="list-decimal list-outside my-5 space-y-2.5 text-[var(--text-muted,#9e9589)] pl-6 marker:text-[var(--accent-color,#f59e0b)] marker:font-mono">
                         {children}
                       </ol>
                     ),
                     li: ({ children }) => (
-                      <li className="leading-relaxed">
+                      <li className="leading-relaxed text-base sm:text-lg pl-1 [&>p]:inline [&>p]:my-0 [&>p+p]:block [&>p+p]:mt-2">
                         {children}
                       </li>
+                    ),
+                    table: ({ children }) => (
+                      <div className="my-8 w-full overflow-x-auto rounded-lg border border-[var(--border-subtle,#292421)] shadow-sm bg-[var(--bg-surface,#181614)]">
+                        <table className="w-full text-left border-collapse text-sm sm:text-base">
+                          {children}
+                        </table>
+                      </div>
+                    ),
+                    thead: ({ children }) => (
+                      <thead className="bg-[var(--bg-surface-hover,#221d19)] border-b border-[var(--border-subtle,#292421)] text-[var(--text-main,#f3f0ea)] font-semibold">
+                        {children}
+                      </thead>
+                    ),
+                    tbody: ({ children }) => (
+                      <tbody className="divide-y divide-[var(--border-subtle,#26211e)] text-[var(--text-muted,#9e9589)]">
+                        {children}
+                      </tbody>
+                    ),
+                    tr: ({ children }) => (
+                      <tr className="hover:bg-[var(--bg-surface-hover,#1f1b18)]/60 transition-colors">
+                        {children}
+                      </tr>
+                    ),
+                    th: ({ children }) => (
+                      <th className="py-3 px-4 sm:px-5 font-serif font-bold text-sm sm:text-base text-[var(--text-main,#f3f0ea)] tracking-wide border-r border-[var(--border-subtle,#292421)] last:border-r-0">
+                        {children}
+                      </th>
+                    ),
+                    td: ({ children }) => (
+                      <td className="py-3 px-4 sm:px-5 text-sm sm:text-base leading-relaxed border-t border-[var(--border-subtle,#221d19)] border-r border-[var(--border-subtle,#221d19)] last:border-r-0 align-top">
+                        {children}
+                      </td>
                     ),
                     hr: () => <hr className="my-8 border-[var(--border-subtle,#292421)]" />,
                     a: ({ href, children }) => {
