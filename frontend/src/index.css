@@ -214,3 +214,38 @@ input[type="number"]::-webkit-outer-spin-button {
 input[type="number"] {
   -moz-appearance: textfield;
 }
+
+/* Natural in-article search highlight - only modifies background color of compatible letters */
+mark.article-search-match,
+.article-search-match,
+[data-article-search-match="true"] {
+  background-color: color-mix(in srgb, var(--accent-color, #f59e0b) 32%, transparent) !important;
+  color: inherit !important;
+  font: inherit !important;
+  display: inline !important;
+  padding: 0 1px !important;
+  margin: 0 !important;
+  border-radius: 2px !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  animation: none !important;
+  transition: background-color 0.12s ease;
+}
+
+/* Active match: distinctly visible background color, keeping typography completely natural */
+mark.article-search-match[data-search-active="true"],
+.article-search-match[data-search-active="true"],
+[data-article-search-match="true"][data-search-active="true"] {
+  background-color: color-mix(in srgb, var(--accent-color, #f59e0b) 70%, transparent) !important;
+  color: inherit !important;
+  font: inherit !important;
+  display: inline !important;
+  padding: 0 1px !important;
+  margin: 0 !important;
+  border-radius: 2px !important;
+  border: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+  animation: none !important;
+}

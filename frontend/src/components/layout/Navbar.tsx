@@ -15,6 +15,26 @@ export const Navbar: FC = () => {
   const [showColorPicker, setShowColorPicker] = useState(false);
   const debounceTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const colorPickerRef = useRef<HTMLDivElement | null>(null);
+  const searchInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Global Ctrl+K / Cmd+K listener
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (isCtrlOrCmd && e.key.toLowerCase() === 'k') {
+        // If on article page, ArticleDetail handles in-article find
+        if (location.pathname.startsWith('/estudos/') && location.pathname !== '/estudos') {
+          return;
+        }
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [location.pathname]);
 
   // Sync search input if URL contains ?q= or when cleared
   useEffect(() => {
@@ -105,6 +125,7 @@ export const Navbar: FC = () => {
           <form onSubmit={handleSearchSubmit} className="relative">
             <div className="relative flex items-center">
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Buscar..."
                 value={searchQuery}
@@ -117,7 +138,7 @@ export const Navbar: FC = () => {
                 <Search className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-[var(--text-dimmed,#686158)] absolute left-2 sm:left-2.5 pointer-events-none" />
               )}
               <kbd className="hidden sm:inline-block absolute right-2 px-1 py-0.5 text-[9px] font-['Raleway',sans-serif] font-medium text-[var(--text-muted,#78716c)] bg-[var(--bg-color,#121110)] border border-[var(--border-subtle,#2e2824)] rounded pointer-events-none">
-                {isDebouncing ? 'aguarde...' : '1s busca'}
+                {isDebouncing ? 'aguarde...' : 'Ctrl+K'}
               </kbd>
             </div>
           </form>

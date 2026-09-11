@@ -1,12 +1,127 @@
-import { useState, useEffect, useMemo, type FC } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { ArrowLeft, Check, ChevronUp, Lock, Mail, Copy, X } from 'lucide-react';
+import { useState, useEffect, useMemo, useRef, useCallback, memo, type FC } from 'react';
+import { useParams, Link, useSearchParams } from 'react-router-dom';
+import { ArrowLeft, Check, ChevronUp, ChevronDown, Lock, Mail, Copy, X, Search } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import 'katex/dist/katex.min.css';
 import { ARTICLES_DATA } from '../data/articlesData';
+
+function makeAccentRegex(query: string): RegExp {
+  const map: Record<string, string> = {
+    a: '[aàáâãäåā]',
+    e: '[eèéêëē]',
+    i: '[iìíîïī]',
+    o: '[oòóôõöō]',
+    u: '[uùúûüū]',
+    c: '[cç]',
+    n: '[nñ]'
+  };
+
+  const normalized = query.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase();
+  let pattern = '';
+  for (const char of normalized) {
+    if (map[char]) {
+      pattern += map[char];
+    } else {
+      pattern += char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+  }
+
+  return new RegExp(`(${pattern})`, 'gi');
+}
+
+export function removeHighlights(root: HTMLElement | null) {
+  if (!root) return;
+  const marks = root.querySelectorAll('[data-article-search-match="true"]');
+  marks.forEach((mark) => {
+    const parent = mark.parentNode;
+    if (parent) {
+      const text = mark.textContent || '';
+      parent.replaceChild(document.createTextNode(text), mark);
+    }
+  });
+  root.normalize();
+}
+
+export function highlightInElement(root: HTMLElement | null, searchTerm: string): HTMLElement[] {
+  if (!root) return [];
+  removeHighlights(root);
+
+  const query = searchTerm.trim();
+  if (!query) return [];
+
+  const regex = makeAccentRegex(query);
+  const testRegex = new RegExp(regex.source, 'i');
+  const matches: HTMLElement[] = [];
+
+  const walker = document.createTreeWalker(
+    root,
+    NodeFilter.SHOW_TEXT,
+    {
+      acceptNode(node) {
+        const parent = node.parentElement;
+        if (!parent) return NodeFilter.FILTER_REJECT;
+        const tag = parent.tagName.toLowerCase();
+        if (
+          tag === 'script' ||
+          tag === 'style' ||
+          tag === 'noscript' ||
+          tag === 'mark'
+        ) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        if (parent.closest('[data-no-search="true"]')) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        if (!node.nodeValue || !testRegex.test(node.nodeValue)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return NodeFilter.FILTER_ACCEPT;
+      }
+    }
+  );
+
+  const textNodes: Text[] = [];
+  while (walker.nextNode()) {
+    textNodes.push(walker.currentNode as Text);
+  }
+
+  for (const textNode of textNodes) {
+    const parent = textNode.parentNode;
+    if (!parent) continue;
+
+    const text = textNode.nodeValue || '';
+    regex.lastIndex = 0;
+    const frag = document.createDocumentFragment();
+    let lastIdx = 0;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(text)) !== null) {
+      if (match.index > lastIdx) {
+        frag.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
+      }
+
+      const mark = document.createElement('mark');
+      mark.setAttribute('data-article-search-match', 'true');
+      mark.className = 'article-search-match';
+      mark.textContent = match[0];
+      frag.appendChild(mark);
+      matches.push(mark);
+
+      lastIdx = regex.lastIndex;
+    }
+
+    if (lastIdx < text.length) {
+      frag.appendChild(document.createTextNode(text.slice(lastIdx)));
+    }
+
+    parent.replaceChild(frag, textNode);
+  }
+
+  return matches;
+}
 
 /**
  * Checks whether a URL is a link to an AI conversation or notebook platform
@@ -102,15 +217,442 @@ export function cleanArticleMarkdown(raw: string): string {
   return text;
 }
 
+interface ArticleContentProps {
+  article: typeof ARTICLES_DATA[0];
+  cleanedContent: string;
+  displayedHeaders: { id: string; title: string; level: number }[];
+  hasBodyContent: boolean;
+  articleContainerRef: React.RefObject<HTMLElement | null>;
+  onAiLinkClick: (url: string, service: string) => void;
+}
+
+const ArticleContent = memo(function ArticleContent({
+  article,
+  cleanedContent,
+  displayedHeaders,
+  hasBodyContent,
+  articleContainerRef,
+  onAiLinkClick,
+}: ArticleContentProps) {
+  return (
+    <article className="lg:col-span-8" ref={articleContainerRef}>
+      {/* Header / Title area */}
+      <header className="space-y-4 pb-8 border-b border-[var(--border-subtle,#26211e)]">
+        {article.category && (
+          <div className="text-xs font-['Lexend',sans-serif] text-[var(--text-dimmed,#78716c)]">
+            {article.category}
+          </div>
+        )}
+
+        <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--text-main,#f3f0ea)] leading-tight">
+          {article.title}
+        </h1>
+
+        {/* Tags */}
+        <div className="flex flex-wrap gap-2 pt-1">
+          {article.tags.map((tag) => (
+            <span
+              key={tag}
+              className="text-xs font-['Lexend',sans-serif] text-[var(--accent-color,#f59e0b)] bg-[var(--accent-muted,rgba(245,158,11,0.1))] px-2 py-0.5 rounded border border-[var(--accent-color,#f59e0b)]/20"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
+
+        {/* Publication metadata */}
+        <div className="flex flex-wrap items-center gap-3 text-xs font-['Raleway',sans-serif] text-[var(--text-dimmed,#78716c)] pt-2">
+          <span className="text-[var(--text-muted,#a89f91)]">{article.displayDate}</span>
+        </div>
+      </header>
+
+      {/* Editorial Markdown Body */}
+      <div
+        onClickCapture={(e) => {
+          const target = (e.target as HTMLElement).closest('a, button');
+          if (target) {
+            const href = target.getAttribute('href') || target.getAttribute('data-href') || (target as HTMLAnchorElement).href || '';
+            const aiInfo = getAiServiceInfo(href);
+            if (aiInfo.isAi) {
+              e.preventDefault();
+              e.stopPropagation();
+              onAiLinkClick(href, aiInfo.serviceName);
+            }
+          }
+        }}
+        className="pt-8 article-markdown font-sans text-base sm:text-lg leading-relaxed text-[var(--text-main,#f3f0ea)] space-y-6"
+      >
+        {!hasBodyContent ? (
+          <div className="py-16 text-center space-y-3">
+            <p className="text-base font-['Lexend',sans-serif] text-[var(--text-muted,#9e9589)]">
+              Este estudo ainda não possui anotações de conteúdo.
+            </p>
+            <Link to="/estudos" className="inline-block text-xs font-['Lexend',sans-serif] text-[var(--accent-color,#f59e0b)] hover:underline">
+              &larr; Voltar para a lista de estudos
+            </Link>
+          </div>
+        ) : (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm, remarkMath]}
+            rehypePlugins={[rehypeKatex]}
+            components={{
+              h1: ({ children }) => {
+                const text = String(children);
+                const header = displayedHeaders.find(h => h.title === text || text.includes(h.title));
+                const id = header ? header.id : text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                return (
+                  <h1 id={id} className="font-serif text-3xl sm:text-4xl font-bold text-[var(--text-main,#f3f0ea)] pt-8 pb-3 border-b border-[var(--border-subtle,#292421)] scroll-mt-24">
+                    {children}
+                  </h1>
+                );
+              },
+              h2: ({ children }) => {
+                const text = String(children);
+                const header = displayedHeaders.find(h => h.title === text || text.includes(h.title));
+                const id = header ? header.id : text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                return (
+                  <h2 id={id} className="font-serif text-2xl sm:text-3xl font-bold text-[var(--text-main,#f3f0ea)] pt-8 pb-2 border-b border-[var(--border-subtle,#292421)] scroll-mt-24">
+                    {children}
+                  </h2>
+                );
+              },
+              h3: ({ children }) => {
+                const text = String(children);
+                const header = displayedHeaders.find(h => h.title === text || text.includes(h.title));
+                const id = header ? header.id : text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+                return (
+                  <h3 id={id} className="font-serif text-xl sm:text-2xl font-bold text-[var(--accent-color,#2563eb)] pt-6 pb-1 scroll-mt-24">
+                    {children}
+                  </h3>
+                );
+              },
+              p: ({ children }) => (
+                <p className="text-[var(--text-muted,#9e9589)] leading-relaxed my-4 text-base sm:text-lg">
+                  {children}
+                </p>
+              ),
+              strong: ({ children }) => (
+                <strong className="text-[var(--text-main,#f3f0ea)] font-semibold">
+                  {children}
+                </strong>
+              ),
+              blockquote: ({ children }) => (
+                <blockquote className="my-6 pl-5 border-l-4 border-[var(--accent-color)] py-3 bg-[var(--bg-surface-hover,#221e1b)] italic font-serif text-[var(--text-main,#f3f0ea)] text-lg sm:text-xl rounded-r shadow-sm">
+                  {children}
+                </blockquote>
+              ),
+              code: ({ className, children }) => {
+                const isInline = !className && typeof children === 'string' && !children.includes('\n');
+                if (isInline) {
+                  return (
+                    <code className="bg-[var(--bg-surface-hover,#221e1b)] text-[var(--accent-color)] px-1.5 py-0.5 rounded font-mono text-sm border border-[var(--border-subtle,#292421)]">
+                      {children}
+                    </code>
+                  );
+                }
+                return (
+                  <pre className="my-5 p-4 bg-[var(--bg-surface,#191614)] border border-[var(--border-subtle,#292421)] rounded-lg overflow-x-auto font-mono text-xs sm:text-sm text-[var(--text-main,#f3f0ea)]">
+                    <code className={className}>{children}</code>
+                  </pre>
+                );
+              },
+              img: ({ src, alt }) => {
+                return (
+                  <figure className="my-8 text-center">
+                    <img
+                      src={src}
+                      alt={alt || 'Imagem do artigo'}
+                      className="max-h-[500px] w-auto mx-auto rounded-lg border border-[var(--border-subtle,#292421)] shadow-xl object-contain bg-[var(--bg-surface,#191614)]"
+                      loading="lazy"
+                      onError={(e) => {
+                        const target = e.currentTarget;
+                        target.style.display = 'none';
+                      }}
+                    />
+                    {alt && (
+                      <figcaption className="mt-2 text-xs font-mono text-[var(--text-dimmed,#686158)]">
+                        {alt}
+                      </figcaption>
+                    )}
+                  </figure>
+                );
+              },
+              ul: ({ children }) => (
+                <ul className="list-disc list-outside my-5 space-y-2.5 text-[var(--text-muted,#9e9589)] pl-6 marker:text-[var(--accent-color,#f59e0b)]">
+                  {children}
+                </ul>
+              ),
+              ol: ({ children }) => (
+                <ol className="list-decimal list-outside my-5 space-y-2.5 text-[var(--text-muted,#9e9589)] pl-6 marker:text-[var(--accent-color,#f59e0b)] marker:font-mono">
+                  {children}
+                </ol>
+              ),
+              li: ({ children }) => (
+                <li className="leading-relaxed text-base sm:text-lg pl-1 [&>p]:inline [&>p]:my-0 [&>p+p]:block [&>p+p]:mt-2">
+                  {children}
+                </li>
+              ),
+              table: ({ children }) => (
+                <div className="my-8 w-full overflow-x-auto rounded-lg border border-[var(--border-subtle,#292421)] shadow-sm bg-[var(--bg-surface,#181614)]">
+                  <table className="w-full text-left border-collapse text-sm sm:text-base">
+                    {children}
+                  </table>
+                </div>
+              ),
+              thead: ({ children }) => (
+                <thead className="bg-[var(--bg-surface-hover,#221d19)] border-b border-[var(--border-subtle,#292421)] text-[var(--text-main,#f3f0ea)] font-semibold">
+                  {children}
+                </thead>
+              ),
+              tbody: ({ children }) => (
+                <tbody className="divide-y divide-[var(--border-subtle,#26211e)] text-[var(--text-muted,#9e9589)]">
+                  {children}
+                </tbody>
+              ),
+              tr: ({ children }) => (
+                <tr className="hover:bg-[var(--bg-surface-hover,#1f1b18)]/60 transition-colors">
+                  {children}
+                </tr>
+              ),
+              th: ({ children }) => (
+                <th className="py-3 px-4 sm:px-5 font-serif font-bold text-sm sm:text-base text-[var(--text-main,#f3f0ea)] tracking-wide border-r border-[var(--border-subtle,#292421)] last:border-r-0">
+                  {children}
+                </th>
+              ),
+              td: ({ children }) => (
+                <td className="py-3 px-4 sm:px-5 text-sm sm:text-base leading-relaxed border-t border-[var(--border-subtle,#221d19)] border-r border-[var(--border-subtle,#221d19)] last:border-r-0 align-top">
+                  {children}
+                </td>
+              ),
+              hr: () => <hr className="my-8 border-[var(--border-subtle,#292421)]" />,
+              a: ({ href, children }) => {
+                const rawHref = href || '';
+                const aiInfo = getAiServiceInfo(rawHref);
+
+                if (aiInfo.isAi) {
+                  const { visiblePart, fadingPart } = getCensoredUrl(rawHref);
+
+                  return (
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        onAiLinkClick(rawHref, aiInfo.serviceName);
+                      }}
+                      title={`Fonte privada (${aiInfo.serviceName}) - Clique para solicitar acesso por e-mail`}
+                      className="inline-flex items-center gap-1.5 text-[var(--accent-color,#2563eb)] hover:text-[var(--accent-hover,#3b82f6)] transition-all cursor-pointer font-mono text-xs sm:text-sm text-left p-0 m-0 bg-transparent border-0 align-baseline group"
+                    >
+                      <span className="inline-flex items-center select-none overflow-hidden relative max-w-full">
+                        <span className="underline group-hover:underline break-all">{visiblePart}</span>
+                        <span 
+                          className="tracking-widest inline-block select-none opacity-60 blur-[0.6px] pointer-events-none [mask-image:linear-gradient(to_right,rgba(0,0,0,1)_0%,rgba(0,0,0,0.5)_35%,transparent_90%)] [-webkit-mask-image:linear-gradient(to_right,rgba(0,0,0,1)_0%,rgba(0,0,0,0.5)_35%,transparent_90%)]"
+                          aria-hidden="true"
+                        >
+                          {fadingPart}
+                        </span>
+                      </span>
+                      <Lock className="w-3.5 h-3.5 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity ml-0.5" />
+                    </button>
+                  );
+                }
+
+                return (
+                  <a
+                    href={rawHref}
+                    target={rawHref.startsWith('http') ? '_blank' : undefined}
+                    rel={rawHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+                    className="text-[var(--accent-color,#2563eb)] underline hover:text-[var(--accent-hover,#3b82f6)] transition-colors break-words"
+                  >
+                    {children}
+                  </a>
+                );
+              }
+            }}
+          >
+            {cleanedContent}
+          </ReactMarkdown>
+        )}
+      </div>
+
+      {/* Bottom Back & Navigation Action */}
+      <div data-no-search="true" className="mt-16 pt-8 border-t border-[var(--border-subtle,#292421)] flex flex-wrap items-center justify-between gap-4">
+        <Link
+          to="/estudos"
+          className="inline-flex items-center gap-2 text-sm font-mono text-[var(--accent-color,#f59e0b)] hover:text-[var(--accent-hover,#fbbf24)] transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Voltar para todos os estudos</span>
+        </Link>
+
+        <Link
+          to="/pomodoro"
+          className="inline-flex items-center gap-2 text-sm font-mono text-[var(--text-muted,#9e9589)] hover:text-[var(--accent-color,#f59e0b)] transition-colors"
+        >
+          <span>Focar no estudo com Pomodoro &rarr;</span>
+        </Link>
+      </div>
+
+    </article>
+  );
+});
+
 export const ArticleDetail: FC = () => {
   const { slug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const initialQuery = searchParams.get('q') || '';
+
   const [activeHeaderId, setActiveHeaderId] = useState<string>('');
   const [aiModalInfo, setAiModalInfo] = useState<{ url: string; service: string } | null>(null);
+  const handleAiLinkClick = useCallback((url: string, service: string) => {
+    setAiModalInfo({ url, service });
+  }, []);
   const [copiedEmail, setCopiedEmail] = useState(false);
+
+  // In-Article Finder (VS Code style highlight & navigation)
+  const [isFinderOpen, setIsFinderOpen] = useState(Boolean(initialQuery));
+  const [finderQuery, setFinderQuery] = useState(initialQuery);
+  const [activeMatchIndex, setActiveMatchIndex] = useState(0);
+  const [totalMatches, setTotalMatches] = useState(0);
+
+  const articleContainerRef = useRef<HTMLElement | null>(null);
+  const finderInputRef = useRef<HTMLInputElement | null>(null);
 
   const article = ARTICLES_DATA.find((a) => a.slug === slug) || ARTICLES_DATA[0];
 
   const cleanedContent = useMemo(() => cleanArticleMarkdown(article?.contentRaw || ''), [article]);
+
+  const closeFinder = useCallback(() => {
+    setIsFinderOpen(false);
+    setFinderQuery('');
+    setTotalMatches(0);
+    setActiveMatchIndex(0);
+    removeHighlights(articleContainerRef.current);
+  }, []);
+
+  const openFinder = useCallback(() => {
+    setIsFinderOpen(true);
+    setTimeout(() => {
+      finderInputRef.current?.focus();
+      finderInputRef.current?.select();
+    }, 40);
+  }, []);
+
+  // Highlight occurrences in DOM when finderQuery or isFinderOpen changes
+  useEffect(() => {
+    if (!articleContainerRef.current) return;
+
+    if (!isFinderOpen || !finderQuery.trim()) {
+      removeHighlights(articleContainerRef.current);
+      setTotalMatches(0);
+      setActiveMatchIndex(0);
+      return;
+    }
+
+    const matches = highlightInElement(articleContainerRef.current, finderQuery.trim());
+    setTotalMatches(matches.length);
+    setActiveMatchIndex(0);
+
+    if (matches.length > 0) {
+      matches.forEach((m, idx) => {
+        if (idx === 0) {
+          m.setAttribute('data-search-active', 'true');
+        } else {
+          m.removeAttribute('data-search-active');
+        }
+      });
+      matches[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }, [finderQuery, isFinderOpen, cleanedContent]);
+
+  // Jump to next match
+  const goToNextMatch = useCallback(() => {
+    if (!articleContainerRef.current || totalMatches === 0) return;
+    const matches = Array.from(
+      articleContainerRef.current.querySelectorAll<HTMLElement>('[data-article-search-match="true"]')
+    );
+    if (matches.length === 0) return;
+
+    const nextIndex = (activeMatchIndex + 1) % matches.length;
+    setActiveMatchIndex(nextIndex);
+
+    matches.forEach((m, idx) => {
+      if (idx === nextIndex) {
+        m.setAttribute('data-search-active', 'true');
+      } else {
+        m.removeAttribute('data-search-active');
+      }
+    });
+
+    matches[nextIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [activeMatchIndex, totalMatches]);
+
+  // Jump to prev match
+  const goToPrevMatch = useCallback(() => {
+    if (!articleContainerRef.current || totalMatches === 0) return;
+    const matches = Array.from(
+      articleContainerRef.current.querySelectorAll<HTMLElement>('[data-article-search-match="true"]')
+    );
+    if (matches.length === 0) return;
+
+    const prevIndex = (activeMatchIndex - 1 + matches.length) % matches.length;
+    setActiveMatchIndex(prevIndex);
+
+    matches.forEach((m, idx) => {
+      if (idx === prevIndex) {
+        m.setAttribute('data-search-active', 'true');
+      } else {
+        m.removeAttribute('data-search-active');
+      }
+    });
+
+    matches[prevIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }, [activeMatchIndex, totalMatches]);
+
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (e.shiftKey) {
+        goToPrevMatch();
+      } else {
+        goToNextMatch();
+      }
+    } else if (e.key === 'Escape') {
+      e.preventDefault();
+      closeFinder();
+    }
+  };
+
+  // Global keydown: Ctrl+K / Cmd+K / Ctrl+F / Cmd+F / Escape
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      const isCtrlOrCmd = e.ctrlKey || e.metaKey;
+      if (isCtrlOrCmd && (e.key.toLowerCase() === 'k' || e.key.toLowerCase() === 'f')) {
+        e.preventDefault();
+        openFinder();
+      } else if (e.key === 'Escape' && isFinderOpen) {
+        e.preventDefault();
+        closeFinder();
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isFinderOpen, openFinder, closeFinder]);
+
+  // Listen to open finder event from navbar or external buttons
+  useEffect(() => {
+    const handleOpenEvent = () => openFinder();
+    window.addEventListener('enkephalos:open-article-finder', handleOpenEvent);
+    return () => window.removeEventListener('enkephalos:open-article-finder', handleOpenEvent);
+  }, [openFinder]);
+
+  // Clean up highlights on unmount or slug change
+  useEffect(() => {
+    return () => {
+      removeHighlights(articleContainerRef.current);
+    };
+  }, [slug]);
 
   const hasBodyContent = useMemo(() => {
     if (!cleanedContent) return false;
@@ -213,8 +755,8 @@ export const ArticleDetail: FC = () => {
     <div className="min-h-screen bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] py-10 px-4 sm:px-6 transition-colors duration-300">
       <div className="max-w-6xl mx-auto">
         
-        {/* Navigation Breadcrumb / Back button */}
-        <div className="mb-8">
+        {/* Navigation Breadcrumb / Back button + In-Article Finder trigger */}
+        <div className="mb-8 flex items-center justify-between gap-4">
           <Link
             to="/estudos"
             className="inline-flex items-center gap-2 text-xs font-['Raleway',sans-serif] font-medium text-[var(--text-muted,#9e9589)] hover:text-[var(--accent-color,#f59e0b)] transition-colors"
@@ -222,272 +764,101 @@ export const ArticleDetail: FC = () => {
             <ArrowLeft className="w-3.5 h-3.5" />
             <span>Voltar para estudos</span>
           </Link>
+
+          <button
+            type="button"
+            onClick={openFinder}
+            className="inline-flex items-center gap-2 text-xs font-['Raleway',sans-serif] font-medium text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-[var(--bg-surface-hover,#221d19)] px-3 py-1.5 rounded-lg border border-[var(--border-subtle,#26211e)] transition-all cursor-pointer shadow-xs"
+            title="Localizar no artigo (Ctrl+K)"
+          >
+            <Search className="w-3.5 h-3.5 text-[var(--accent-color,#f59e0b)]" />
+            <span className="hidden sm:inline">Localizar no artigo</span>
+            <kbd className="hidden sm:inline-block text-[10px] font-mono px-1.5 py-0.5 rounded bg-[var(--bg-surface,#181614)] border border-[var(--border-subtle,#26211e)] text-[var(--text-dimmed,#78716c)]">
+              Ctrl+K
+            </kbd>
+          </button>
         </div>
+
+        {/* VS Code-style Floating Find Widget (Fixed at top-right, triggered by Ctrl+K) */}
+        {isFinderOpen && (
+          <div
+            data-no-search="true"
+            className="fixed top-20 right-4 sm:right-8 z-50 bg-[var(--bg-surface,#181614)]/95 backdrop-blur-md border border-[var(--border-subtle,#2a2420)] shadow-2xl rounded-xl p-2 flex items-center gap-2 animate-in fade-in slide-in-from-top-2 duration-150"
+          >
+            <div className="flex items-center gap-2 bg-[var(--bg-color,#121110)] border border-[var(--border-subtle,#2e2824)] focus-within:border-[var(--accent-color)] rounded-lg px-2.5 py-1.5 transition-colors">
+              <Search className="w-3.5 h-3.5 text-[var(--accent-color)] shrink-0" />
+              <input
+                ref={finderInputRef}
+                type="text"
+                value={finderQuery}
+                onChange={(e) => setFinderQuery(e.target.value)}
+                onKeyDown={handleInputKeyDown}
+                placeholder="Localizar no artigo... (Enter para pular)"
+                className="w-36 sm:w-60 bg-transparent text-xs text-[var(--text-main,#f3f0ea)] placeholder-[var(--text-dimmed,#78716c)] outline-none font-['Lexend',sans-serif]"
+                autoFocus
+              />
+
+              {finderQuery.trim() && (
+                <span className="text-[11px] font-['Lexend',sans-serif] shrink-0 select-none pl-1">
+                  {totalMatches > 0 ? (
+                    <span className="text-[var(--text-dimmed,#78716c)]">
+                      <strong className="text-[var(--accent-color)] font-bold">{activeMatchIndex + 1}</strong> de{' '}
+                      <span className="text-[var(--text-main,#f3f0ea)] font-semibold">{totalMatches}</span>
+                    </span>
+                  ) : (
+                    <span className="text-red-400 font-medium">0 encontrados</span>
+                  )}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-1 shrink-0">
+              <button
+                type="button"
+                onClick={goToPrevMatch}
+                disabled={totalMatches === 0}
+                title="Ocorrência anterior (Shift + Enter)"
+                className="p-1.5 rounded-md hover:bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                <ChevronUp className="w-3.5 h-3.5" />
+              </button>
+
+              <button
+                type="button"
+                onClick={goToNextMatch}
+                disabled={totalMatches === 0}
+                title="Próxima ocorrência (Enter)"
+                className="p-1.5 rounded-md hover:bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              >
+                <ChevronDown className="w-3.5 h-3.5" />
+              </button>
+
+              <div className="w-px h-4 bg-[var(--border-subtle,#26211e)] mx-0.5" />
+
+              <button
+                type="button"
+                onClick={closeFinder}
+                title="Fechar (Esc)"
+                className="p-1.5 rounded-md hover:bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] transition-colors cursor-pointer"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
 
         {/* 2-Column Grid: Article text on Left + Dynamic Headers Table of Contents on Right */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 relative">
           
-          {/* Main Article Content */}
-          <article className="lg:col-span-8">
-            
-            {/* Header / Title area */}
-            <header className="space-y-4 pb-8 border-b border-[var(--border-subtle,#26211e)]">
-              {article.category && (
-                <div className="text-xs font-['Lexend',sans-serif] text-[var(--text-dimmed,#78716c)]">
-                  {article.category}
-                </div>
-              )}
-
-              <h1 className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight text-[var(--text-main,#f3f0ea)] leading-tight">
-                {article.title}
-              </h1>
-
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 pt-1">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="text-xs font-['Lexend',sans-serif] text-[var(--accent-color,#f59e0b)] bg-[var(--accent-muted,rgba(245,158,11,0.1))] px-2 py-0.5 rounded border border-[var(--accent-color,#f59e0b)]/20"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Publication metadata */}
-              <div className="flex flex-wrap items-center gap-3 text-xs font-['Raleway',sans-serif] text-[var(--text-dimmed,#78716c)] pt-2">
-                <span className="text-[var(--text-muted,#a89f91)]">{article.displayDate}</span>
-              </div>
-            </header>
-
-            {/* Editorial Markdown Body */}
-            <div
-              onClickCapture={(e) => {
-                const target = (e.target as HTMLElement).closest('a, button');
-                if (target) {
-                  const href = target.getAttribute('href') || target.getAttribute('data-href') || (target as HTMLAnchorElement).href || '';
-                  const aiInfo = getAiServiceInfo(href);
-                  if (aiInfo.isAi) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    setAiModalInfo({ url: href, service: aiInfo.serviceName });
-                  }
-                }
-              }}
-              className="pt-8 article-markdown font-sans text-base sm:text-lg leading-relaxed text-[var(--text-main,#f3f0ea)] space-y-6"
-            >
-              {!hasBodyContent ? (
-                <div className="py-16 text-center space-y-3">
-                  <p className="text-base font-['Lexend',sans-serif] text-[var(--text-muted,#9e9589)]">
-                    Este estudo ainda não possui anotações de conteúdo.
-                  </p>
-                  <Link to="/estudos" className="inline-block text-xs font-['Lexend',sans-serif] text-[var(--accent-color,#f59e0b)] hover:underline">
-                    &larr; Voltar para a lista de estudos
-                  </Link>
-                </div>
-              ) : (
-                <ReactMarkdown
-                  remarkPlugins={[remarkGfm, remarkMath]}
-                  rehypePlugins={[rehypeKatex]}
-                  components={{
-                    h1: ({ children }) => {
-                      const text = String(children);
-                      const header = displayedHeaders.find(h => h.title === text || text.includes(h.title));
-                      const id = header ? header.id : text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                      return (
-                        <h1 id={id} className="font-serif text-3xl sm:text-4xl font-bold text-[var(--text-main,#f3f0ea)] pt-8 pb-3 border-b border-[var(--border-subtle,#292421)] scroll-mt-24">
-                          {children}
-                        </h1>
-                      );
-                    },
-                    h2: ({ children }) => {
-                      const text = String(children);
-                      const header = displayedHeaders.find(h => h.title === text || text.includes(h.title));
-                      const id = header ? header.id : text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                      return (
-                        <h2 id={id} className="font-serif text-2xl sm:text-3xl font-bold text-[var(--text-main,#f3f0ea)] pt-8 pb-2 border-b border-[var(--border-subtle,#292421)] scroll-mt-24">
-                          {children}
-                        </h2>
-                      );
-                    },
-                    h3: ({ children }) => {
-                      const text = String(children);
-                      const header = displayedHeaders.find(h => h.title === text || text.includes(h.title));
-                      const id = header ? header.id : text.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-                      return (
-                        <h3 id={id} className="font-serif text-xl sm:text-2xl font-bold text-[var(--accent-color,#2563eb)] pt-6 pb-1 scroll-mt-24">
-                          {children}
-                        </h3>
-                      );
-                    },
-                    p: ({ children }) => (
-                      <p className="text-[var(--text-muted,#9e9589)] leading-relaxed my-4 text-base sm:text-lg">
-                        {children}
-                      </p>
-                    ),
-                    strong: ({ children }) => (
-                      <strong className="text-[var(--text-main,#f3f0ea)] font-semibold">
-                        {children}
-                      </strong>
-                    ),
-                    blockquote: ({ children }) => (
-                      <blockquote className="my-6 pl-5 border-l-4 border-[var(--accent-color)] py-3 bg-[var(--bg-surface-hover,#221e1b)] italic font-serif text-[var(--text-main,#f3f0ea)] text-lg sm:text-xl rounded-r shadow-sm">
-                        {children}
-                      </blockquote>
-                    ),
-                    code: ({ className, children }) => {
-                      const isInline = !className && typeof children === 'string' && !children.includes('\n');
-                      if (isInline) {
-                        return (
-                          <code className="bg-[var(--bg-surface-hover,#221e1b)] text-[var(--accent-color)] px-1.5 py-0.5 rounded font-mono text-sm border border-[var(--border-subtle,#292421)]">
-                            {children}
-                          </code>
-                        );
-                      }
-                      return (
-                        <pre className="my-5 p-4 bg-[var(--bg-surface,#191614)] border border-[var(--border-subtle,#292421)] rounded-lg overflow-x-auto font-mono text-xs sm:text-sm text-[var(--text-main,#f3f0ea)]">
-                          <code className={className}>{children}</code>
-                        </pre>
-                      );
-                    },
-                    img: ({ src, alt }) => {
-                      return (
-                        <figure className="my-8 text-center">
-                          <img
-                            src={src}
-                            alt={alt || 'Imagem do artigo'}
-                            className="max-h-[500px] w-auto mx-auto rounded-lg border border-[var(--border-subtle,#292421)] shadow-xl object-contain bg-[var(--bg-surface,#191614)]"
-                            loading="lazy"
-                            onError={(e) => {
-                              const target = e.currentTarget;
-                              target.style.display = 'none';
-                            }}
-                          />
-                          {alt && (
-                            <figcaption className="mt-2 text-xs font-mono text-[var(--text-dimmed,#686158)]">
-                              {alt}
-                            </figcaption>
-                          )}
-                        </figure>
-                      );
-                    },
-                    ul: ({ children }) => (
-                      <ul className="list-disc list-outside my-5 space-y-2.5 text-[var(--text-muted,#9e9589)] pl-6 marker:text-[var(--accent-color,#f59e0b)]">
-                        {children}
-                      </ul>
-                    ),
-                    ol: ({ children }) => (
-                      <ol className="list-decimal list-outside my-5 space-y-2.5 text-[var(--text-muted,#9e9589)] pl-6 marker:text-[var(--accent-color,#f59e0b)] marker:font-mono">
-                        {children}
-                      </ol>
-                    ),
-                    li: ({ children }) => (
-                      <li className="leading-relaxed text-base sm:text-lg pl-1 [&>p]:inline [&>p]:my-0 [&>p+p]:block [&>p+p]:mt-2">
-                        {children}
-                      </li>
-                    ),
-                    table: ({ children }) => (
-                      <div className="my-8 w-full overflow-x-auto rounded-lg border border-[var(--border-subtle,#292421)] shadow-sm bg-[var(--bg-surface,#181614)]">
-                        <table className="w-full text-left border-collapse text-sm sm:text-base">
-                          {children}
-                        </table>
-                      </div>
-                    ),
-                    thead: ({ children }) => (
-                      <thead className="bg-[var(--bg-surface-hover,#221d19)] border-b border-[var(--border-subtle,#292421)] text-[var(--text-main,#f3f0ea)] font-semibold">
-                        {children}
-                      </thead>
-                    ),
-                    tbody: ({ children }) => (
-                      <tbody className="divide-y divide-[var(--border-subtle,#26211e)] text-[var(--text-muted,#9e9589)]">
-                        {children}
-                      </tbody>
-                    ),
-                    tr: ({ children }) => (
-                      <tr className="hover:bg-[var(--bg-surface-hover,#1f1b18)]/60 transition-colors">
-                        {children}
-                      </tr>
-                    ),
-                    th: ({ children }) => (
-                      <th className="py-3 px-4 sm:px-5 font-serif font-bold text-sm sm:text-base text-[var(--text-main,#f3f0ea)] tracking-wide border-r border-[var(--border-subtle,#292421)] last:border-r-0">
-                        {children}
-                      </th>
-                    ),
-                    td: ({ children }) => (
-                      <td className="py-3 px-4 sm:px-5 text-sm sm:text-base leading-relaxed border-t border-[var(--border-subtle,#221d19)] border-r border-[var(--border-subtle,#221d19)] last:border-r-0 align-top">
-                        {children}
-                      </td>
-                    ),
-                    hr: () => <hr className="my-8 border-[var(--border-subtle,#292421)]" />,
-                    a: ({ href, children }) => {
-                      const rawHref = href || '';
-                      const aiInfo = getAiServiceInfo(rawHref);
-
-                      if (aiInfo.isAi) {
-                        const { visiblePart, fadingPart } = getCensoredUrl(rawHref);
-
-                        return (
-                          <button
-                            type="button"
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              setAiModalInfo({ url: rawHref, service: aiInfo.serviceName });
-                            }}
-                            title={`Fonte privada (${aiInfo.serviceName}) - Clique para solicitar acesso por e-mail`}
-                            className="inline-flex items-center gap-1.5 text-[var(--accent-color,#2563eb)] hover:text-[var(--accent-hover,#3b82f6)] transition-all cursor-pointer font-mono text-xs sm:text-sm text-left p-0 m-0 bg-transparent border-0 align-baseline group"
-                          >
-                            <span className="inline-flex items-center select-none overflow-hidden relative max-w-full">
-                              <span className="underline group-hover:underline break-all">{visiblePart}</span>
-                              <span 
-                                className="tracking-widest inline-block select-none opacity-60 blur-[0.6px] pointer-events-none [mask-image:linear-gradient(to_right,rgba(0,0,0,1)_0%,rgba(0,0,0,0.5)_35%,transparent_90%)] [-webkit-mask-image:linear-gradient(to_right,rgba(0,0,0,1)_0%,rgba(0,0,0,0.5)_35%,transparent_90%)]"
-                                aria-hidden="true"
-                              >
-                                {fadingPart}
-                              </span>
-                            </span>
-                            <Lock className="w-3.5 h-3.5 shrink-0 opacity-75 group-hover:opacity-100 transition-opacity ml-0.5" />
-                          </button>
-                        );
-                      }
-
-                      return (
-                        <a
-                          href={rawHref}
-                          target={rawHref.startsWith('http') ? '_blank' : undefined}
-                          rel={rawHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-                          className="text-[var(--accent-color,#2563eb)] underline hover:text-[var(--accent-hover,#3b82f6)] transition-colors break-words"
-                        >
-                          {children}
-                        </a>
-                      );
-                    }
-                  }}
-                >
-                  {cleanedContent}
-                </ReactMarkdown>
-              )}
-            </div>
-
-            {/* Bottom Back & Navigation Action */}
-            <div className="mt-16 pt-8 border-t border-[var(--border-subtle,#292421)] flex flex-wrap items-center justify-between gap-4">
-              <Link
-                to="/estudos"
-                className="inline-flex items-center gap-2 text-sm font-mono text-[var(--accent-color,#f59e0b)] hover:text-[var(--accent-hover,#fbbf24)] transition-colors"
-              >
-                <ArrowLeft className="w-4 h-4" />
-                <span>Voltar para todos os estudos</span>
-              </Link>
-
-              <Link
-                to="/pomodoro"
-                className="inline-flex items-center gap-2 text-sm font-mono text-[var(--text-muted,#9e9589)] hover:text-[var(--accent-color,#f59e0b)] transition-colors"
-              >
-                <span>Focar no estudo com Pomodoro &rarr;</span>
-              </Link>
-            </div>
-
-          </article>
+          {/* Main Article Content (memoized to keep DOM search highlights stable) */}
+          <ArticleContent
+            article={article}
+            cleanedContent={cleanedContent}
+            displayedHeaders={displayedHeaders}
+            hasBodyContent={hasBodyContent}
+            articleContainerRef={articleContainerRef}
+            onAiLinkClick={handleAiLinkClick}
+          />
 
           {/* Right Sidebar ("Nesta página" with HEADERS / TOPICS - matching photo 2) */}
           <aside className="lg:col-span-4 hidden lg:block">
