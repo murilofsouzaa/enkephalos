@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Play, Pause, RotateCcw, Pencil, Check } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Play, Pause, RotateCcw, Check } from 'lucide-react';
 import { usePomodoroSettings } from '../context/PomodoroSettingsContext';
 
 const restartSound = '/time-restart.mp3';
@@ -21,9 +21,38 @@ interface ButtonProps {
 const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, setTimeLeft , isActive, TOTAL_SECONDS, isRealMode, mode = 'pomodoro'}: ButtonProps) => {
     const { buttonSoundsEnabled, ballSize, timerDurations, setTimerDuration } = usePomodoroSettings();
     const [isEditingTime, setIsEditingTime] = useState(false);
+    const editorRef = useRef<HTMLDivElement | null>(null);
     
     const initialMinutes = Math.floor(TOTAL_SECONDS / 60);
     const initialSeconds = TOTAL_SECONDS % 60;
+
+    // Click anywhere on screen or press Escape to close the editor
+    useEffect(() => {
+        if (!isEditingTime) return;
+
+        const handleClickOutside = (e: MouseEvent) => {
+            if (editorRef.current && !editorRef.current.contains(e.target as Node)) {
+                setIsEditingTime(false);
+            }
+        };
+
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') {
+                setIsEditingTime(false);
+            }
+        };
+
+        const timer = setTimeout(() => {
+            document.addEventListener('click', handleClickOutside);
+            document.addEventListener('keydown', handleKeyDown);
+        }, 10);
+
+        return () => {
+            clearTimeout(timer);
+            document.removeEventListener('click', handleClickOutside);
+            document.removeEventListener('keydown', handleKeyDown);
+        };
+    }, [isEditingTime]);
 
     const handleRestartButtonAudio = () => {
         if (!buttonSoundsEnabled) return;
@@ -65,6 +94,7 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
         <div className="z-10 flex flex-col justify-center items-center select-none pointer-events-auto max-w-[85%] text-center">
             {isEditingTime && isFirstTime ? (
                 <div
+                    ref={editorRef}
                     onClick={(e) => e.stopPropagation()}
                     className="z-30 flex flex-col items-center gap-2 bg-black/80 backdrop-blur-md px-4 sm:px-6 py-3 rounded-2xl border border-white/20 shadow-2xl animate-in fade-in zoom-in-95 duration-150 my-1"
                 >
@@ -92,7 +122,7 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
                                 max={180}
                                 value={mode ? timerDurations[mode] : initialMinutes}
                                 onChange={(e) => mode && setTimerDuration(mode, Number(e.target.value))}
-                                className="w-14 sm:w-16 text-center text-2xl sm:text-3xl font-bold font-['Lexend',sans-serif] bg-transparent text-white focus:outline-none border-b border-[var(--accent-color,#f59e0b)] pb-0.5"
+                                className="w-14 sm:w-16 text-center text-2xl sm:text-3xl font-bold font-['Lexend',sans-serif] bg-transparent text-white focus:outline-none border-b border-[var(--accent-color,#f59e0b)] pb-0.5 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                                 autoFocus
                             />
                             <span className="text-xs text-white/70 font-['Lexend',sans-serif]">min</span>
@@ -118,44 +148,27 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
                     </button>
                 </div>
             ) : (
-                <>
-                    <div 
-                        onClick={(e) => {
-                            if (isFirstTime) {
-                                e.stopPropagation();
-                                setIsEditingTime(true);
-                            }
-                        }}
-                        className={`text-white font-bold leading-none tracking-tight ${isFirstTime ? 'cursor-pointer group/timer' : ''}`}
-                        style={{ fontSize: `clamp(2.25rem, min(18vw, 15vh), ${maxTimerSize}px)` }}
-                        title={isFirstTime ? 'Clique para editar o tempo' : undefined}
-                    >
-                        {isFirstTime ? (
-                            <span className="font-['Lexend',sans-serif] drop-shadow-md group-hover/timer:text-amber-200 transition-colors">
-                                {initialMinutes.toString().padStart(2, '0')}:{initialSeconds.toString().padStart(2, '0')}
-                            </span>
-                        ) : (
-                            <span className="font-['Lexend',sans-serif] drop-shadow-md">
-                                {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
-                            </span>
-                        )}
-                    </div>
-
-                    {isFirstTime && (
-                        <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                setIsEditingTime(true);
-                            }}
-                            className="inline-flex items-center gap-1 text-[10px] sm:text-[11px] text-white/70 hover:text-white bg-black/25 hover:bg-black/50 px-2 sm:px-2.5 py-0.5 rounded-full border border-white/10 hover:border-white/30 backdrop-blur-sm transition-all cursor-pointer mt-1"
-                            title="Editar tempo deste timer"
-                        >
-                            <Pencil className="w-2.5 h-2.5" />
-                            <span>Editar tempo</span>
-                        </button>
+                <div 
+                    onClick={(e) => {
+                        if (isFirstTime) {
+                            e.stopPropagation();
+                            setIsEditingTime(true);
+                        }
+                    }}
+                    className={`text-white font-bold leading-none tracking-tight ${isFirstTime ? 'cursor-pointer group/timer' : ''}`}
+                    style={{ fontSize: `clamp(2.25rem, min(18vw, 15vh), ${maxTimerSize}px)` }}
+                    title={isFirstTime ? 'Clique para ajustar o tempo' : undefined}
+                >
+                    {isFirstTime ? (
+                        <span className="font-['Lexend',sans-serif] drop-shadow-md group-hover/timer:text-amber-200 transition-colors">
+                            {initialMinutes.toString().padStart(2, '0')}:{initialSeconds.toString().padStart(2, '0')}
+                        </span>
+                    ) : (
+                        <span className="font-['Lexend',sans-serif] drop-shadow-md">
+                            {minutes.toString().padStart(2, '0')}:{seconds.toString().padStart(2, '0')}
+                        </span>
                     )}
-                </>
+                </div>
             )}
             
             {isRealMode ? (
