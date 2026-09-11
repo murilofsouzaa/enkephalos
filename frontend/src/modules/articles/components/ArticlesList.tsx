@@ -90,6 +90,131 @@ function collectAllNodeIds(nodes: TreeNode[]): string[] {
   return ids;
 }
 
+function getAncestorIds(nodeId: string, tree: TreeNode[]): string[] {
+  const ancestors: string[] = [];
+  function find(nodes: TreeNode[], targetId: string, currentAncestors: string[]): boolean {
+    for (const node of nodes) {
+      if (node.id === targetId) {
+        ancestors.push(...currentAncestors);
+        return true;
+      }
+      if (node.children.length > 0) {
+        if (find(node.children, targetId, [...currentAncestors, node.id])) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+  find(tree, nodeId, []);
+  return ancestors;
+}
+
+// Interactive recursive component for the right sidebar folder tree with full subfolder support
+interface SidebarTreeNodeProps {
+  node: TreeNode;
+  depth: number;
+  activeId: string;
+  collapsedSidebarFolders: Record<string, boolean>;
+  onToggleSidebarFolder: (id: string) => void;
+  onSelectFolder: (id: string) => void;
+  searchTerm: string;
+}
+
+const SidebarTreeNode: FC<SidebarTreeNodeProps> = ({
+  node,
+  depth,
+  activeId,
+  collapsedSidebarFolders,
+  onToggleSidebarFolder,
+  onSelectFolder,
+  searchTerm
+}) => {
+  const hasChildren = node.children.length > 0;
+  const isCollapsed = !searchTerm && !!collapsedSidebarFolders[node.id];
+  const isActive = activeId === node.id;
+
+  return (
+    <div className="select-none">
+      <div
+        onClick={() => onSelectFolder(node.id)}
+        className={`group flex items-center gap-1.5 py-1 px-1.5 rounded-md text-xs transition-colors cursor-pointer ${
+          isActive
+            ? 'text-[var(--accent-color,#f59e0b)] font-medium bg-[var(--accent-muted,rgba(245,158,11,0.12))]'
+            : 'text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-[var(--bg-surface-hover,#1a1715)]'
+        }`}
+      >
+        {/* Toggle Chevron */}
+        {hasChildren ? (
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onToggleSidebarFolder(node.id);
+            }}
+            className="p-0.5 -ml-0.5 text-[var(--text-dimmed,#78716c)] hover:text-[var(--accent-color,#f59e0b)] transition-colors rounded shrink-0 cursor-pointer"
+            title={isCollapsed ? 'Expandir subpastas' : 'Recolher subpastas'}
+          >
+            {isCollapsed ? (
+              <ChevronRight className="w-3.5 h-3.5 transition-transform" />
+            ) : (
+              <ChevronDown className="w-3.5 h-3.5 transition-transform" />
+            )}
+          </button>
+        ) : (
+          <span className="w-3.5 h-3.5 -ml-0.5 shrink-0 inline-block opacity-0" />
+        )}
+
+        {/* Folder Icon */}
+        <div className="text-[var(--accent-color,#f59e0b)]/80 shrink-0">
+          {hasChildren && !isCollapsed ? (
+            <FolderOpen className="w-3.5 h-3.5" />
+          ) : (
+            <Folder className="w-3.5 h-3.5" />
+          )}
+        </div>
+
+        {/* Folder Name */}
+        <span
+          className="truncate font-['Lexend',sans-serif] flex-1 text-left"
+          title={`${node.name} (${node.totalCount} ${node.totalCount === 1 ? 'estudo' : 'estudos'})`}
+        >
+          {node.name}
+        </span>
+
+        {/* Count */}
+        <span
+          className={`text-[10px] font-mono shrink-0 ml-1.5 ${
+            isActive
+              ? 'text-[var(--accent-color,#f59e0b)] font-semibold'
+              : 'text-[var(--text-dimmed,#78716c)] group-hover:text-[var(--text-muted,#a89f91)]'
+          }`}
+        >
+          {node.totalCount}
+        </span>
+      </div>
+
+      {/* Nested Subpastas */}
+      {hasChildren && !isCollapsed && (
+        <div className="ml-2 pl-2 border-l border-[var(--border-subtle,#26211e)] space-y-0.5 mt-0.5">
+          {node.children.map((child) => (
+            <SidebarTreeNode
+              key={child.id}
+              node={child}
+              depth={depth + 1}
+              activeId={activeId}
+              collapsedSidebarFolders={collapsedSidebarFolders}
+              onToggleSidebarFolder={onToggleSidebarFolder}
+              onSelectFolder={onSelectFolder}
+              searchTerm={searchTerm}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
 // Recursive component representing an Obsidian folder and all its subfolders/notes
 interface FolderTreeNodeProps {
   node: TreeNode;
@@ -315,26 +440,12 @@ export const ArticlesList: FC = () => {
     return groupedByPeriod.slice(0, visibleMonthCount);
   }, [groupedByPeriod, visibleMonthCount, searchTerm]);
 
-  // Flattened folders for the right sidebar (top-level + level 1 subfolders)
-  const sidebarFolderItems = useMemo(() => {
-    const items: { id: string; label: string; count: number; depth: number }[] = [];
+  // Collapsed state for the right sidebar folder tree
+  const [collapsedSidebarFolders, setCollapsedSidebarFolders] = useState<Record<string, boolean>>({});
 
-    function traverse(nodes: TreeNode[], depth: number) {
-      for (const node of nodes) {
-        items.push({
-          id: node.id,
-          label: node.name,
-          count: node.totalCount,
-          depth
-        });
-        if (depth < 1 && node.children.length > 0) {
-          traverse(node.children, depth + 1);
-        }
-      }
-    }
-
-    traverse(folderTree, 0);
-    return items;
+  // All folder & subfolder node IDs
+  const allFolderNodeIds = useMemo(() => {
+    return collectAllNodeIds(folderTree);
   }, [folderTree]);
 
   // Instagram-style Infinite Scroll Observer for Timeline mode
@@ -380,7 +491,7 @@ export const ArticlesList: FC = () => {
     const targetIds =
       viewMode === 'timeline'
         ? displayedGroups.map((g) => g.elementId)
-        : sidebarFolderItems.map((item) => item.id);
+        : allFolderNodeIds;
 
     targetIds.forEach((id) => {
       const el = document.getElementById(id);
@@ -388,7 +499,7 @@ export const ArticlesList: FC = () => {
     });
 
     return () => observer.disconnect();
-  }, [viewMode, displayedGroups, sidebarFolderItems]);
+  }, [viewMode, displayedGroups, allFolderNodeIds]);
 
   const scrollToSection = (elementId: string) => {
     if (viewMode === 'timeline') {
@@ -417,10 +528,20 @@ export const ArticlesList: FC = () => {
   };
 
   const scrollToFolder = (elementId: string) => {
-    // Expand this folder
+    const ancestors = getAncestorIds(elementId, folderTree);
+
+    // Ensure this folder and all its ancestors are expanded in the main view
     setCollapsedFolders((prev) => {
       const next = { ...prev };
       delete next[elementId];
+      ancestors.forEach((id) => delete next[id]);
+      return next;
+    });
+
+    // Ensure ancestors are expanded in the sidebar so current node is visible
+    setCollapsedSidebarFolders((prev) => {
+      const next = { ...prev };
+      ancestors.forEach((id) => delete next[id]);
       return next;
     });
 
@@ -440,6 +561,25 @@ export const ArticlesList: FC = () => {
         setActiveSectionId(elementId);
       }
     }, 60);
+  };
+
+  const toggleSidebarFolder = (nodeId: string) => {
+    setCollapsedSidebarFolders((prev) => ({
+      ...prev,
+      [nodeId]: !prev[nodeId]
+    }));
+  };
+
+  const expandAllSidebarFolders = () => {
+    setCollapsedSidebarFolders({});
+  };
+
+  const collapseAllSidebarFolders = () => {
+    const map: Record<string, boolean> = {};
+    allFolderNodeIds.forEach((id) => {
+      map[id] = true;
+    });
+    setCollapsedSidebarFolders(map);
   };
 
   const toggleFolder = (elementId: string) => {
@@ -699,11 +839,35 @@ export const ArticlesList: FC = () => {
 
               <div className="flex items-center justify-between pt-1">
                 <h4 className="text-xs font-['Raleway',sans-serif] font-bold uppercase tracking-wider text-[var(--text-dimmed,#78716c)]">
-                  {viewMode === 'timeline' ? 'Nesta página' : 'Pastas'}
+                  {viewMode === 'timeline' ? 'Nesta página' : 'Pastas e Subpastas'}
                 </h4>
-                <span className="text-[10px] font-mono text-[var(--text-dimmed,#78716c)]">
-                  {viewMode === 'timeline' ? `${allPeriods.length} períodos` : `${sidebarFolderItems.length} pastas`}
-                </span>
+                {viewMode === 'folders' ? (
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={expandAllSidebarFolders}
+                      className="text-[10px] font-['Lexend',sans-serif] text-[var(--text-dimmed,#78716c)] hover:text-[var(--accent-color,#f59e0b)] transition-colors cursor-pointer"
+                      title="Expandir todas as pastas e subpastas"
+                    >
+                      Expandir
+                    </button>
+                    <span className="text-[var(--border-subtle,#26211e)] text-[10px]">•</span>
+                    <button
+                      onClick={collapseAllSidebarFolders}
+                      className="text-[10px] font-['Lexend',sans-serif] text-[var(--text-dimmed,#78716c)] hover:text-[var(--accent-color,#f59e0b)] transition-colors cursor-pointer"
+                      title="Recolher todas as pastas e subpastas"
+                    >
+                      Recolher
+                    </button>
+                    <span className="text-[var(--border-subtle,#26211e)] text-[10px]">•</span>
+                    <span className="text-[10px] font-mono text-[var(--text-dimmed,#78716c)]">
+                      {allFolderNodeIds.length}
+                    </span>
+                  </div>
+                ) : (
+                  <span className="text-[10px] font-mono text-[var(--text-dimmed,#78716c)]">
+                    {allPeriods.length} períodos
+                  </span>
+                )}
               </div>
 
               <nav className="space-y-1 text-sm font-['Lexend',sans-serif]">
@@ -731,27 +895,18 @@ export const ArticlesList: FC = () => {
                     );
                   })
                 ) : (
-                  sidebarFolderItems.map((item) => {
-                    const isCurrentActive = activeSectionId === item.id;
-
-                    return (
-                      <button
-                        key={item.id}
-                        onClick={() => scrollToFolder(item.id)}
-                        style={{ paddingLeft: `${item.depth * 12 + 8}px` }}
-                        className={`w-full text-left py-1.5 pr-2 rounded-md text-xs transition-colors flex items-center justify-between cursor-pointer ${
-                          isCurrentActive
-                            ? 'text-[var(--accent-color,#f59e0b)] font-medium bg-[var(--accent-muted,rgba(245,158,11,0.1))]'
-                            : 'text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-[var(--bg-surface-hover,#181513)]'
-                        }`}
-                      >
-                        <span className="truncate">{item.label}</span>
-                        <span className="text-[10px] font-mono opacity-70 ml-2">
-                          {item.count}
-                        </span>
-                      </button>
-                    );
-                  })
+                  folderTree.map((rootNode) => (
+                    <SidebarTreeNode
+                      key={rootNode.id}
+                      node={rootNode}
+                      depth={0}
+                      activeId={activeSectionId}
+                      collapsedSidebarFolders={collapsedSidebarFolders}
+                      onToggleSidebarFolder={toggleSidebarFolder}
+                      onSelectFolder={scrollToFolder}
+                      searchTerm={searchTerm}
+                    />
+                  ))
                 )}
               </nav>
             </div>
