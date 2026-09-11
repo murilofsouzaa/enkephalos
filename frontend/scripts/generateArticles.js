@@ -39,6 +39,11 @@ function scanDir(dir) {
   return results;
 }
 
+if (!fs.existsSync(fullNotesDir)) {
+  console.log(`[generateArticles] Diretório ${fullNotesDir} não encontrado no ambiente atual. Utilizando articlesData.json já gerado.`);
+  process.exit(0);
+}
+
 const files = scanDir(fullNotesDir);
 console.log(`Encontradas ${files.length} notas em ${fullNotesDir}`);
 

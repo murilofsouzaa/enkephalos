@@ -1,0 +1,56 @@
+name: Deploy Enkephalos to VPS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy via SSH
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Execute Deployment on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          # VPS Connection Details
+          # Configure these in GitHub -> Repository Settings -> Secrets and variables -> Actions
+          # or substitute directly with your values if desired:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER || 'root' }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script_stop: true
+          script: |
+            echo "🚀 Iniciando deploy do Enkephalos (enkephalos.mubadev.com.br)..."
+
+            DEPLOY_DIR="/var/www/enkephalos"
+
+            # 1. Garante que o diretório de destino existe e sincroniza o repositório
+            if [ ! -d "$DEPLOY_DIR/.git" ]; then
+              echo "📦 Clonando repositório pela primeira vez em $DEPLOY_DIR..."
+              mkdir -p "$DEPLOY_DIR"
+              git clone https://github.com/murilofsouzaa/enkephalos.git "$DEPLOY_DIR"
+              cd "$DEPLOY_DIR"
+            else
+              echo "🔄 Atualizando código existente em $DEPLOY_DIR..."
+              cd "$DEPLOY_DIR"
+              git fetch origin main
+              git reset --hard origin/main
+            fi
+
+            # 2. Build e inicialização dos containers Docker
+            echo "🐳 Subindo containers via Docker Compose..."
+            docker compose down --remove-orphans || true
+            docker compose up -d --build
+
+            # 3. Limpeza de imagens antigas sem tag para economizar disco
+            echo "🧹 Limpando imagens Docker antigas..."
+            docker image prune -f
+
+            echo "✅ Deploy concluído com sucesso em enkephalos.mubadev.com.br!"
