@@ -43,8 +43,6 @@ export const PomodoroSettingsDrawer: FC = () => {
     setSelectedAmbientUrl,
     ambientVolume,
     setAmbientVolume,
-    isAmbientPlaying,
-    toggleAmbientPlaying,
     isSettingsOpen,
     setIsSettingsOpen,
     resetSettings,
@@ -346,7 +344,7 @@ export const PomodoroSettingsDrawer: FC = () => {
               </h4>
               {selectedAmbientUrl && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
-                  {isAmbientPlaying ? 'Tocando' : 'Pausado'}
+                  Ativo
                 </span>
               )}
             </div>
@@ -358,24 +356,13 @@ export const PomodoroSettingsDrawer: FC = () => {
                   Chuva para Concentração
                 </p>
                 <p className="text-[11px] text-[var(--text-dimmed,#78716c)]">
-                  {selectedAmbientUrl && isAmbientPlaying
+                  {selectedAmbientUrl
                     ? 'Áudio de chuva ambiente ativo'
                     : 'Som de chuva desativado'}
                 </p>
               </div>
 
               <div className="flex items-center gap-2.5 shrink-0">
-                {selectedAmbientUrl && (
-                  <button
-                    type="button"
-                    onClick={toggleAmbientPlaying}
-                    className="w-7 h-7 rounded-full bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center hover:scale-105 transition-transform cursor-pointer"
-                    title={isAmbientPlaying ? 'Pausar Chuva' : 'Tocar Chuva'}
-                  >
-                    {isAmbientPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5 ml-0.5" />}
-                  </button>
-                )}
-
                 <button
                   type="button"
                   onClick={() => {
@@ -388,7 +375,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                   className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
                     selectedAmbientUrl ? 'bg-[var(--accent-color,#f59e0b)]' : 'bg-[var(--border-subtle,#2d2723)]'
                   }`}
-                  title={selectedAmbientUrl ? 'Desativar som de chuva' : 'Ativar som de chuva'}
+                  title={selectedAmbientUrl ? 'Desligar som de chuva' : 'Ligar som de chuva'}
                 >
                   <span
                     className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
