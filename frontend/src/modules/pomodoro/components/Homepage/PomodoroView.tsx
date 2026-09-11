@@ -1,11 +1,11 @@
 import { useEffect } from 'react';
 import { useTimer } from '../../hooks/useTimer';
 import Button from '../../ui/Button';
-import timerStart from '/timer-start.mp3'
-import pausedSound from '/timer-paused.mp3'
-import timerEnded from '/timer-ended.mp3'
+import { usePomodoroSettings } from '../../context/PomodoroSettingsContext';
 
-
+const timerStart = '/timer-start.mp3';
+const pausedSound = '/timer-paused.mp3';
+const timerEnded = '/timer-ended.mp3';
 
 const PomodoroView = () => {
     const {
@@ -21,6 +21,13 @@ const PomodoroView = () => {
         waterPercentage,
     } = useTimer('pomodoro');
 
+    const {
+        liquidColors,
+        isLiquidAnimated,
+        buttonSoundsEnabled,
+        ballSize,
+    } = usePomodoroSettings();
+
     useEffect(() => {
         let timerId: ReturnType<typeof setInterval>;
         
@@ -32,46 +39,90 @@ const PomodoroView = () => {
             setIsActive(false);
         }
 
-        if(timeLeft == 0){
-            const audio = new Audio(timerEnded);
-            audio.play();
+        if (timeLeft === 0) {
+            try {
+                const audio = new Audio(timerEnded);
+                audio.volume = 0.8;
+                audio.play().catch(() => {});
+            } catch {
+                // ignore
+            }
         }
         
         return () => clearInterval(timerId as unknown as number);
     }, [isActive, timeLeft, setTimeLeft, setIsActive]);
 
-
     const handleStartClick = () => {
-        const audio = new Audio(timerStart);
-        audio.currentTime = 0;
-        audio.play();
+        if (!buttonSoundsEnabled) return;
+        try {
+            const audio = new Audio(timerStart);
+            audio.currentTime = 0;
+            audio.volume = 0.7;
+            audio.play().catch(() => {});
+        } catch {
+            // ignore
+        }
     };
 
-    const handlePauseButtonAudio = () =>{
-        const audio = new Audio(pausedSound);
-        audio.play();
-    }
+    const handlePauseButtonAudio = () => {
+        if (!buttonSoundsEnabled) return;
+        try {
+            const audio = new Audio(pausedSound);
+            audio.currentTime = 0;
+            audio.volume = 0.7;
+            audio.play().catch(() => {});
+        } catch {
+            // ignore
+        }
+    };
+
+    const liquidColor = liquidColors.pomodoro || '#06b6d4';
 
     return ( 
-        <main className="flex justify-center items-center">
+        <main className="flex justify-center items-center py-1">
             <div
                 onClick={() => {
                     if (isFirstTime) {
                         handleStartClick();
                         setIsFirstTime(false);
-                    }else{
+                    } else {
                         handlePauseButtonAudio();
                     }
                     setIsActive((prev) => !prev);
                 }}
-                className="relative overflow-hidden timer-subcontainer flex flex-col justify-center items-center bg-(--bg-color) border-10 border-(--timer-stroke) 
-                h-150 w-150 rounded-[100%] hover:scale-[0.98] hover:cursor-pointer transition-all mt-20"
+                style={{
+                    width: `min(86vw, calc(100vh - 14.5rem), ${ballSize}px)`,
+                    height: `min(86vw, calc(100vh - 14.5rem), ${ballSize}px)`,
+                }}
+                className="aspect-square relative overflow-hidden timer-subcontainer flex flex-col justify-center items-center bg-[var(--bg-color,#121110)] border-[8px] sm:border-[10px] border-[var(--timer-stroke,#eedfc8)] rounded-full hover:scale-[0.99] hover:cursor-pointer transition-all shadow-2xl"
             >
+                {/* Liquid fill container */}
                 <div 
-                    className="absolute left-0 w-full h-full z-0 transition-all duration-1000 ease-linear"
-                    style={{ top: `${100 - waterPercentage}%` }}>
-                        <div className="absolute top-0 left-[-50%] w-[200%] h-[200%] bg-(--pomodoro-circle-color) opacity-50 rounded-[45%] animate-[spin_10s_linear_infinite]"></div>  
-                        <div className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] bg-(--pomodoro-circle-color) rounded-[40%] animate-[spin_7s_linear_infinite]"></div>
+                    className="absolute left-0 w-full h-full z-0 transition-all duration-1000 ease-linear pointer-events-none"
+                    style={{ top: `${100 - waterPercentage}%` }}
+                >
+                    {isLiquidAnimated ? (
+                        <>
+                            <div 
+                                className="absolute top-0 left-[-50%] w-[200%] h-[200%] opacity-55 rounded-[45%] animate-[spin_10s_linear_infinite]"
+                                style={{ backgroundColor: liquidColor }}
+                            />  
+                            <div 
+                                className="absolute top-[2%] left-[-50%] w-[200%] h-[200%] rounded-[40%] animate-[spin_7s_linear_infinite]"
+                                style={{ backgroundColor: liquidColor }}
+                            />
+                        </>
+                    ) : (
+                        <div 
+                            className="absolute inset-0 w-full h-full"
+                            style={{ 
+                                backgroundColor: liquidColor,
+                                boxShadow: 'inset 0 6px 20px rgba(255, 255, 255, 0.25)',
+                            }}
+                        >
+                            <div className="w-full h-1 bg-white/35 shadow-sm" />
+                        </div>
+                    )}
                 </div>
 
                 <Button 
@@ -86,7 +137,7 @@ const PomodoroView = () => {
                 />
             </div>
         </main>
-     );
+    );
 };
  
 export default PomodoroView;
