@@ -143,6 +143,7 @@ const DEFAULT_SETTINGS = {
   },
   isLiquidAnimated: true,
   buttonSoundsEnabled: true,
+  isRealPomodoroMode: false,
   selectedBackground: null as string | null,
   ballSize: 480,
   selectedSongUrl: null as string | null,
@@ -160,6 +161,8 @@ interface PomodoroSettingsContextType {
   setIsLiquidAnimated: (animated: boolean) => void;
   buttonSoundsEnabled: boolean;
   setButtonSoundsEnabled: (enabled: boolean) => void;
+  isRealPomodoroMode: boolean;
+  setIsRealPomodoroMode: (enabled: boolean) => void;
   selectedBackground: string | null;
   setSelectedBackground: (bg: string | null) => void;
   ballSize: number;
@@ -317,6 +320,10 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
     setSettings((prev: typeof settings) => ({ ...prev, buttonSoundsEnabled }));
   };
 
+  const setIsRealPomodoroMode = (isRealPomodoroMode: boolean) => {
+    setSettings((prev: typeof settings) => ({ ...prev, isRealPomodoroMode }));
+  };
+
   const setSelectedBackground = (selectedBackground: string | null) => {
     setSettings((prev: typeof settings) => ({ ...prev, selectedBackground }));
   };
@@ -394,6 +401,8 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
         setIsLiquidAnimated,
         buttonSoundsEnabled: settings.buttonSoundsEnabled,
         setButtonSoundsEnabled,
+        isRealPomodoroMode: settings.isRealPomodoroMode,
+        setIsRealPomodoroMode,
         selectedBackground: settings.selectedBackground,
         setSelectedBackground,
         ballSize: settings.ballSize,

@@ -6,6 +6,7 @@ import { usePomodoroSettings } from '../../context/PomodoroSettingsContext';
 const timerStart = '/timer-start.mp3';
 const pausedSound = '/timer-paused.mp3';
 const timerEnded = '/timer-ended.mp3';
+const restartSound = '/time-restart.mp3';
 
 const PomodoroView = () => {
     const {
@@ -26,6 +27,7 @@ const PomodoroView = () => {
         isLiquidAnimated,
         buttonSoundsEnabled,
         ballSize,
+        isRealPomodoroMode,
     } = usePomodoroSettings();
 
     useEffect(() => {
@@ -76,6 +78,18 @@ const PomodoroView = () => {
         }
     };
 
+    const handleRestartButtonAudio = () => {
+        if (!buttonSoundsEnabled) return;
+        try {
+            const audio = new Audio(restartSound);
+            audio.currentTime = 0;
+            audio.volume = 0.7;
+            audio.play().catch(() => {});
+        } catch {
+            // ignore
+        }
+    };
+
     const liquidColor = liquidColors.pomodoro || '#06b6d4';
 
     return ( 
@@ -85,10 +99,17 @@ const PomodoroView = () => {
                     if (isFirstTime) {
                         handleStartClick();
                         setIsFirstTime(false);
+                        setIsActive(true);
+                    } else if (isRealPomodoroMode) {
+                        // In Real Pomodoro mode: no pause allowed, stopping resets back to start!
+                        handleRestartButtonAudio();
+                        setIsActive(false);
+                        setIsFirstTime(true);
+                        setTimeLeft(TOTAL_SECONDS);
                     } else {
                         handlePauseButtonAudio();
+                        setIsActive((prev) => !prev);
                     }
-                    setIsActive((prev) => !prev);
                 }}
                 style={{
                     width: `min(86vw, calc(100vh - 14.5rem), ${ballSize}px)`,
@@ -134,6 +155,7 @@ const PomodoroView = () => {
                     setIsActive={setIsActive}
                     setTimeLeft={setTimeLeft}
                     TOTAL_SECONDS={TOTAL_SECONDS}
+                    isRealMode={isRealPomodoroMode}
                 />
             </div>
         </main>

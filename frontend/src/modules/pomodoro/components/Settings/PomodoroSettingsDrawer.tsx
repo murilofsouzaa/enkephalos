@@ -23,6 +23,8 @@ export const PomodoroSettingsDrawer: FC = () => {
     setIsLiquidAnimated,
     buttonSoundsEnabled,
     setButtonSoundsEnabled,
+    isRealPomodoroMode,
+    setIsRealPomodoroMode,
     selectedBackground,
     setSelectedBackground,
     ballSize,
@@ -363,6 +365,46 @@ export const PomodoroSettingsDrawer: FC = () => {
             </h4>
 
             <div className="space-y-2">
+              {/* Toggle Modo Pomodoro Real (Sem Pausas • Se Parar Reseta) */}
+              <div className={`p-3 rounded-lg border transition-colors ${
+                isRealPomodoroMode 
+                  ? 'bg-[var(--accent-muted,rgba(245,158,11,0.1))] border-[var(--accent-color,#f59e0b)]/50 shadow-sm' 
+                  : 'bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)]'
+              }`}>
+                <div className="flex items-center justify-between">
+                  <div className="space-y-0.5 pr-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-[var(--text-main,#f3f0ea)]">
+                        Modo Pomodoro Real
+                      </span>
+                      {isRealPomodoroMode && (
+                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                          Ativo
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-[var(--text-dimmed,#78716c)] leading-tight">
+                      Sem pausas. Se parar ou interromper, o timer reseta para o início.
+                    </p>
+                  </div>
+
+                  <button
+                    type="button"
+                    onClick={() => setIsRealPomodoroMode(!isRealPomodoroMode)}
+                    className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer shrink-0 ${
+                      isRealPomodoroMode ? 'bg-[var(--accent-color,#f59e0b)]' : 'bg-[var(--border-subtle,#2d2723)]'
+                    }`}
+                    title={isRealPomodoroMode ? 'Desativar modo pomodoro real' : 'Ativar modo pomodoro real'}
+                  >
+                    <span
+                      className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                        isRealPomodoroMode ? 'translate-x-6' : 'translate-x-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+
               {/* Toggle Liquid Animation */}
               <div className="flex items-center justify-between p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg">
                 <div className="space-y-0.5">
