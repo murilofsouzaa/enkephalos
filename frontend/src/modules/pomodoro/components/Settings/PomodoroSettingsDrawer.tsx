@@ -172,7 +172,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                       max={180}
                       value={timerDurations.pomodoro}
                       onChange={(e) => setTimerDuration('pomodoro', Number(e.target.value))}
-                      className="w-9 text-center text-xs font-mono font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
+                      className="w-9 text-center text-xs font-['Lexend',sans-serif] font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
                     />
                     <span className="text-[10px] text-[var(--text-dimmed,#78716c)] pr-0.5">m</span>
                     <button
@@ -194,7 +194,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                       key={m}
                       type="button"
                       onClick={() => setTimerDuration('pomodoro', m)}
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer transition-colors ${
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-['Lexend',sans-serif] font-medium cursor-pointer transition-colors ${
                         timerDurations.pomodoro === m
                           ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-bold shadow-xs'
                           : 'bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
@@ -237,7 +237,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                       max={60}
                       value={timerDurations.shortBreak}
                       onChange={(e) => setTimerDuration('shortBreak', Number(e.target.value))}
-                      className="w-9 text-center text-xs font-mono font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
+                      className="w-9 text-center text-xs font-['Lexend',sans-serif] font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
                     />
                     <span className="text-[10px] text-[var(--text-dimmed,#78716c)] pr-0.5">m</span>
                     <button
@@ -259,7 +259,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                       key={m}
                       type="button"
                       onClick={() => setTimerDuration('shortBreak', m)}
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer transition-colors ${
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-['Lexend',sans-serif] font-medium cursor-pointer transition-colors ${
                         timerDurations.shortBreak === m
                           ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-bold shadow-xs'
                           : 'bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
@@ -302,7 +302,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                       max={90}
                       value={timerDurations.longBreak}
                       onChange={(e) => setTimerDuration('longBreak', Number(e.target.value))}
-                      className="w-9 text-center text-xs font-mono font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
+                      className="w-9 text-center text-xs font-['Lexend',sans-serif] font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
                     />
                     <span className="text-[10px] text-[var(--text-dimmed,#78716c)] pr-0.5">m</span>
                     <button
@@ -324,7 +324,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                       key={m}
                       type="button"
                       onClick={() => setTimerDuration('longBreak', m)}
-                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer transition-colors ${
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-['Lexend',sans-serif] font-medium cursor-pointer transition-colors ${
                         timerDurations.longBreak === m
                           ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-bold shadow-xs'
                           : 'bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
@@ -345,7 +345,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                 Som de Chuva
               </h4>
               {selectedAmbientUrl && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-mono">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
                   {isAmbientPlaying ? 'Tocando' : 'Pausado'}
                 </span>
               )}
@@ -404,7 +404,7 @@ export const PomodoroSettingsDrawer: FC = () => {
               <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2 animate-in fade-in duration-200">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="text-[var(--text-muted,#9e9589)]">Volume da Chuva</span>
-                  <span className="font-mono text-[10px] text-[var(--accent-color,#f59e0b)]">
+                  <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[var(--accent-color,#f59e0b)]">
                     {ambientVolume}%
                   </span>
                 </div>
@@ -426,7 +426,7 @@ export const PomodoroSettingsDrawer: FC = () => {
               <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted,#9e9589)]">
                 Plano de Fundo (Wallpapers 4K)
               </h4>
-              <span className="text-[10px] text-[var(--accent-color,#f59e0b)] font-mono">
+              <span className="text-[10px] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
                 Sem desfoque
               </span>
             </div>
@@ -549,7 +549,7 @@ export const PomodoroSettingsDrawer: FC = () => {
             <div className="p-3 bg-[var(--bg-surface,#171412)]/70 border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2.5">
               <div className="flex items-center justify-between text-[11px] text-[var(--text-dimmed,#78716c)]">
                 <span>Paletas Rápidas</span>
-                <span className="font-mono text-[10px] uppercase">{liquidColors[activeColorTab]}</span>
+                <span className="font-['Lexend',sans-serif] text-[10px] uppercase font-semibold text-[var(--text-muted,#9e9589)]">{liquidColors[activeColorTab]}</span>
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
@@ -608,7 +608,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                         Modo Pomodoro Real
                       </span>
                       {isRealPomodoroMode && (
-                        <span className="text-[9px] font-mono uppercase px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
+                        <span className="text-[9px] font-['Lexend',sans-serif] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 border border-amber-500/30">
                           Ativo
                         </span>
                       )}
@@ -695,7 +695,7 @@ export const PomodoroSettingsDrawer: FC = () => {
               <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted,#9e9589)]">
                 Tamanho do Timer
               </h4>
-              <span className="text-[11px] font-mono text-[var(--accent-color,#f59e0b)]">
+              <span className="text-[11px] font-['Lexend',sans-serif] font-semibold text-[var(--accent-color,#f59e0b)]">
                 {ballSize}px
               </span>
             </div>
@@ -741,7 +741,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                 Músicas de Foco (Songs)
               </h4>
               {selectedSongUrl && (
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-mono">
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
                   {isMusicPlaying ? 'Tocando' : 'Pausada'}
                 </span>
               )}
@@ -751,7 +751,7 @@ export const PomodoroSettingsDrawer: FC = () => {
             <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2">
               <div className="flex items-center justify-between text-[11px]">
                 <span className="text-[var(--text-muted,#9e9589)]">Volume da Música</span>
-                <span className="font-mono text-[10px] text-[var(--accent-color,#f59e0b)]">
+                <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[var(--accent-color,#f59e0b)]">
                   {musicVolume}%
                 </span>
               </div>
