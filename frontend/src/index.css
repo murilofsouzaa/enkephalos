@@ -1,18 +1,206 @@
-@import url('https://fonts.googleapis.com/css2?family=Actor&family=Archivo+Black&family=Bebas+Neue&family=Geologica:wght,CRSV@100..900,0&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Lexend:wght@100..900&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Neucha&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Share+Tech+Mono&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=VT323&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Actor&family=Archivo+Black&family=Bebas+Neue&family=Dancing+Script:wght@400..700&family=Geologica:wght,CRSV@100..900,0&family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Lexend:wght@100..900&family=Libre+Franklin:ital,wght@0,100..900;1,100..900&family=Montserrat:ital,wght@0,100..900;1,100..900&family=Neucha&family=Raleway:ital,wght@0,100..900;1,100..900&family=Roboto:ital,wght@0,100..900;1,100..900&family=Share+Tech+Mono&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&family=Stalemate&family=The+Girl+Next+Door&family=VT323&display=swap');
 @import "tailwindcss";
 
 @theme {
+  --font-girl-next-door: "The Girl Next Door", cursive;
+  --font-stalemate: "Stalemate", cursive;
+  --font-dancing: "Dancing Script", cursive;
   --font-lexend: "Lexend", sans-serif;
+  --font-raleway: "Raleway", sans-serif;
+  --font-serif: "Source Serif 4", Georgia, serif;
+  --font-mono: "Share Tech Mono", monospace;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
-:root{
-  --pomodoro-circle-color: #fac107;
-  --short-break-circle-color: #3090d4;
-  --long-break-circle-color: #d24141;
-  --bg-color: #30323D;
-  --timer-stroke: #585858; 
+:root {
+  --bg-color: #121110;
+  --bg-surface: #191614;
+  --bg-surface-hover: #221e1b;
+  --border-subtle: #292421;
+  --border-active: var(--accent-color);
+  --text-main: #f3f0ea;
+  --text-muted: #c4bcb0;
+  --text-dimmed: #80776d;
+  --timer-stroke: #2e2824; 
+
+  /* Dynamic Accent Colors (Default: Blue) */
+  --accent-color: #2563eb;
+  --accent-hover: #3b82f6;
+  --accent-deep: #1d4ed8;
+  --accent-muted: rgba(37, 99, 235, 0.12);
+  --accent-glow: rgba(37, 99, 235, 0.35);
+
+  --pomodoro-circle-color: var(--accent-color);
+  --short-break-circle-color: #38bdf8;
+  --long-break-circle-color: #f43f5e;
 }
 
-body{
+/* Light Mode Overrides */
+:root.light, [data-theme="light"] {
+  --bg-color: #faf8f5;
+  --bg-surface: #ffffff;
+  --bg-surface-hover: #f0ebe2;
+  --border-subtle: #e2dbd0;
+  --border-active: var(--accent-color);
+  --text-main: #141210;
+  --text-muted: #38332e;
+  --text-dimmed: #6c635a;
+  --timer-stroke: #e7e0d5;
+}
+
+/* Dynamic Accent Colors */
+[data-accent="blue"] {
+  --accent-color: #2563eb;
+  --accent-hover: #3b82f6;
+  --accent-deep: #1d4ed8;
+  --accent-muted: rgba(37, 99, 235, 0.12);
+  --accent-glow: rgba(37, 99, 235, 0.35);
+}
+
+:root.dark [data-accent="blue"], :root.dark[data-accent="blue"], [data-theme="dark"][data-accent="blue"] {
+  --accent-color: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-deep: #2563eb;
+  --accent-muted: rgba(59, 130, 246, 0.18);
+  --accent-glow: rgba(59, 130, 246, 0.45);
+}
+
+[data-accent="amber"], :root:not([data-accent]) {
+  --accent-color: #f59e0b;
+  --accent-hover: #fbbf24;
+  --accent-deep: #d97706;
+  --accent-muted: rgba(245, 158, 11, 0.15);
+  --accent-glow: rgba(245, 158, 11, 0.4);
+}
+
+[data-accent="emerald"] {
+  --accent-color: #10b981;
+  --accent-hover: #34d399;
+  --accent-deep: #059669;
+  --accent-muted: rgba(16, 185, 129, 0.15);
+  --accent-glow: rgba(16, 185, 129, 0.4);
+}
+
+[data-accent="violet"] {
+  --accent-color: #a855f7;
+  --accent-hover: #c084fc;
+  --accent-deep: #9333ea;
+  --accent-muted: rgba(168, 85, 247, 0.15);
+  --accent-glow: rgba(168, 85, 247, 0.4);
+}
+
+[data-accent="cyan"] {
+  --accent-color: #06b6d4;
+  --accent-hover: #22d3ee;
+  --accent-deep: #0891b2;
+  --accent-muted: rgba(6, 182, 212, 0.15);
+  --accent-glow: rgba(6, 182, 212, 0.4);
+}
+
+[data-accent="rose"] {
+  --accent-color: #f43f5e;
+  --accent-hover: #fb7185;
+  --accent-deep: #e11d48;
+  --accent-muted: rgba(244, 63, 94, 0.15);
+  --accent-glow: rgba(244, 63, 94, 0.4);
+}
+
+.font-girl-next-door {
+  font-family: 'The Girl Next Door', cursive !important;
+}
+
+.font-stalemate {
+  font-family: 'Stalemate', cursive !important;
+}
+
+.font-dancing {
+  font-family: 'Dancing Script', cursive !important;
+}
+
+.font-lexend {
+  font-family: 'Lexend', sans-serif !important;
+}
+
+.font-raleway {
+  font-family: 'Raleway', sans-serif !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
   background: var(--bg-color);
+  color: var(--text-main);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+}
+
+/* Sleek, minimal custom scrollbars */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-subtle, rgba(255, 255, 255, 0.12)) transparent;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--border-subtle, rgba(255, 255, 255, 0.14));
+  border-radius: 9999px;
+  transition: background-color 0.2s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color, #f59e0b);
+}
+
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-subtle, rgba(255, 255, 255, 0.14)) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 5px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--border-subtle, rgba(255, 255, 255, 0.14));
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: var(--accent-color, #f59e0b);
+}
+
+@keyframes screenWipe {
+  0% {
+    transform: translate3d(-100%, 0, 0);
+  }
+  48% {
+    transform: translate3d(0%, 0, 0);
+  }
+  52% {
+    transform: translate3d(0%, 0, 0);
+  }
+  100% {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
+.animate-screen-wipe {
+  animation: screenWipe 0.72s cubic-bezier(0.65, 0, 0.35, 1) forwards;
+  will-change: transform;
 }

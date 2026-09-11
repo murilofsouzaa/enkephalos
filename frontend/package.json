@@ -5,15 +5,22 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "prebuild": "node scripts/generateArticles.js",
     "build": "tsc -b && vite build",
+    "sync:notes": "node scripts/generateArticles.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",
+    "framer-motion": "^13.2.0",
+    "gsap": "^3.15.0",
     "lucide-react": "^1.33.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^7.18.3",
+    "remark-gfm": "^4.0.1",
     "tailwindcss": "^4.3.3"
   },
   "devDependencies": {
