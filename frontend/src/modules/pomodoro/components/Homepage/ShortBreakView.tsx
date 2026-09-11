@@ -134,6 +134,7 @@ const ShortBreakView = () => {
                     setIsActive={setIsActive}
                     setTimeLeft={setTimeLeft}
                     TOTAL_SECONDS={TOTAL_SECONDS}
+                    mode="shortBreak"
                 />
             </div>
         </main>

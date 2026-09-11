@@ -134,6 +134,7 @@ const LongBreakView = () => {
                     setIsActive={setIsActive}
                     setTimeLeft={setTimeLeft}
                     TOTAL_SECONDS={TOTAL_SECONDS}
+                    mode="longBreak"
                 />
             </div>
         </main>

@@ -1,21 +1,29 @@
-import {useState} from 'react'
+import { useState, useEffect } from 'react';
+import { usePomodoroSettings } from '../context/PomodoroSettingsContext';
 
-export type TimerMode = 'pomodoro' | 'short_break' | 'long_break'
+export type TimerMode = 'pomodoro' | 'short_break' | 'long_break';
 
+export function useTimer(mode: TimerMode = 'pomodoro') {
+    const { timerDurations } = usePomodoroSettings();
 
-export function useTimer(mode:TimerMode = 'pomodoro'){
+    const durationMinutes =
+        mode === 'pomodoro'
+            ? timerDurations.pomodoro
+            : mode === 'short_break'
+            ? timerDurations.shortBreak
+            : timerDurations.longBreak;
 
-    const times =  {
-        pomodoro: 25 * 60,
-        short_break: 5 * 60,
-        long_break: 15 * 60
-    }
-
-    const TOTAL_SECONDS = times[mode]
+    const TOTAL_SECONDS = Math.max(1, durationMinutes) * 60;
 
     const [timeLeft, setTimeLeft] = useState<number>(TOTAL_SECONDS);
     const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
     const [isActive, setIsActive] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (isFirstTime) {
+            setTimeLeft(TOTAL_SECONDS);
+        }
+    }, [TOTAL_SECONDS, isFirstTime]);
     
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;

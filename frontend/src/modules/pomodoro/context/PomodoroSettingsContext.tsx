@@ -6,6 +6,12 @@ export interface LiquidColors {
   longBreak: string;
 }
 
+export interface TimerDurations {
+  pomodoro: number;
+  shortBreak: number;
+  longBreak: number;
+}
+
 export interface SongOption {
   id: string;
   title: string;
@@ -141,6 +147,11 @@ const DEFAULT_SETTINGS = {
     shortBreak: '#10b981',
     longBreak: '#3b82f6',
   },
+  timerDurations: {
+    pomodoro: 25,
+    shortBreak: 5,
+    longBreak: 15,
+  },
   isLiquidAnimated: true,
   buttonSoundsEnabled: true,
   isRealPomodoroMode: false,
@@ -157,6 +168,8 @@ const STORAGE_KEY = 'enkephalos_pomodoro_settings_v2';
 interface PomodoroSettingsContextType {
   liquidColors: LiquidColors;
   setLiquidColor: (mode: 'pomodoro' | 'shortBreak' | 'longBreak', color: string) => void;
+  timerDurations: TimerDurations;
+  setTimerDuration: (mode: 'pomodoro' | 'shortBreak' | 'longBreak', minutes: number) => void;
   isLiquidAnimated: boolean;
   setIsLiquidAnimated: (animated: boolean) => void;
   buttonSoundsEnabled: boolean;
@@ -199,6 +212,7 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
           ...DEFAULT_SETTINGS,
           ...parsed,
           liquidColors: { ...DEFAULT_SETTINGS.liquidColors, ...(parsed.liquidColors || {}) },
+          timerDurations: { ...DEFAULT_SETTINGS.timerDurations, ...(parsed.timerDurations || {}) },
         };
       }
     } catch {
@@ -312,6 +326,17 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
     }));
   };
 
+  const setTimerDuration = (mode: 'pomodoro' | 'shortBreak' | 'longBreak', minutes: number) => {
+    const safeMinutes = Math.max(1, Math.min(180, Math.round(Number(minutes) || 1)));
+    setSettings((prev: typeof settings) => ({
+      ...prev,
+      timerDurations: {
+        ...prev.timerDurations,
+        [mode]: safeMinutes,
+      },
+    }));
+  };
+
   const setIsLiquidAnimated = (isLiquidAnimated: boolean) => {
     setSettings((prev: typeof settings) => ({ ...prev, isLiquidAnimated }));
   };
@@ -397,6 +422,8 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
       value={{
         liquidColors: settings.liquidColors,
         setLiquidColor,
+        timerDurations: settings.timerDurations,
+        setTimerDuration,
         isLiquidAnimated: settings.isLiquidAnimated,
         setIsLiquidAnimated,
         buttonSoundsEnabled: settings.buttonSoundsEnabled,

@@ -6,6 +6,7 @@ import {
   Pause,
   RotateCcw,
   Check,
+  Clock,
 } from 'lucide-react';
 import {
   usePomodoroSettings,
@@ -19,6 +20,8 @@ export const PomodoroSettingsDrawer: FC = () => {
   const {
     liquidColors,
     setLiquidColor,
+    timerDurations,
+    setTimerDuration,
     isLiquidAnimated,
     setIsLiquidAnimated,
     buttonSoundsEnabled,
@@ -108,6 +111,216 @@ export const PomodoroSettingsDrawer: FC = () => {
         {/* Single Main Scroll Body with Sleek Custom Scrollbar (NO inner sub-scrollbars) */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-7 custom-scrollbar text-xs font-['Lexend',sans-serif]">
           
+          {/* ================= SECTION 0: DURAÇÃO DOS TIMERS ================= */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted,#9e9589)] flex items-center gap-1.5">
+                <Clock className="w-3.5 h-3.5 text-[var(--accent-color,#f59e0b)]" />
+                Duração dos Timers
+              </h4>
+              <span className="text-[10px] text-[var(--text-dimmed,#78716c)]">
+                Em minutos
+              </span>
+            </div>
+
+            <div className="space-y-2.5">
+              {/* Pomodoro */}
+              <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shadow-xs"
+                      style={{ backgroundColor: liquidColors.pomodoro }}
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-[var(--text-main,#f3f0ea)]">
+                        Pomodoro (Foco)
+                      </span>
+                      <p className="text-[10px] text-[var(--text-dimmed,#78716c)]">Tempo de trabalho contínuo</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-[var(--bg-surface-hover,#221d19)] px-1.5 py-0.5 rounded-md border border-[var(--border-subtle,#26211e)]">
+                    <button
+                      type="button"
+                      onClick={() => setTimerDuration('pomodoro', timerDurations.pomodoro - 1)}
+                      className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-white hover:bg-white/10 rounded cursor-pointer font-bold text-sm"
+                      title="Diminuir 1 minuto"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={180}
+                      value={timerDurations.pomodoro}
+                      onChange={(e) => setTimerDuration('pomodoro', Number(e.target.value))}
+                      className="w-9 text-center text-xs font-mono font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
+                    />
+                    <span className="text-[10px] text-[var(--text-dimmed,#78716c)] pr-0.5">m</span>
+                    <button
+                      type="button"
+                      onClick={() => setTimerDuration('pomodoro', timerDurations.pomodoro + 1)}
+                      className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-white hover:bg-white/10 rounded cursor-pointer font-bold text-sm"
+                      title="Aumentar 1 minuto"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                  <span className="text-[10px] text-[var(--text-dimmed,#78716c)] mr-0.5">Atalhos:</span>
+                  {[15, 20, 25, 30, 45, 50, 60].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setTimerDuration('pomodoro', m)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer transition-colors ${
+                        timerDurations.pomodoro === m
+                          ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-bold shadow-xs'
+                          : 'bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
+                      }`}
+                    >
+                      {m}m
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pausa Curta */}
+              <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shadow-xs"
+                      style={{ backgroundColor: liquidColors.shortBreak }}
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-[var(--text-main,#f3f0ea)]">
+                        Pausa Curta
+                      </span>
+                      <p className="text-[10px] text-[var(--text-dimmed,#78716c)]">Descanso entre sessões</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-[var(--bg-surface-hover,#221d19)] px-1.5 py-0.5 rounded-md border border-[var(--border-subtle,#26211e)]">
+                    <button
+                      type="button"
+                      onClick={() => setTimerDuration('shortBreak', timerDurations.shortBreak - 1)}
+                      className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-white hover:bg-white/10 rounded cursor-pointer font-bold text-sm"
+                      title="Diminuir 1 minuto"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={60}
+                      value={timerDurations.shortBreak}
+                      onChange={(e) => setTimerDuration('shortBreak', Number(e.target.value))}
+                      className="w-9 text-center text-xs font-mono font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
+                    />
+                    <span className="text-[10px] text-[var(--text-dimmed,#78716c)] pr-0.5">m</span>
+                    <button
+                      type="button"
+                      onClick={() => setTimerDuration('shortBreak', timerDurations.shortBreak + 1)}
+                      className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-white hover:bg-white/10 rounded cursor-pointer font-bold text-sm"
+                      title="Aumentar 1 minuto"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                  <span className="text-[10px] text-[var(--text-dimmed,#78716c)] mr-0.5">Atalhos:</span>
+                  {[3, 5, 8, 10, 15].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setTimerDuration('shortBreak', m)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer transition-colors ${
+                        timerDurations.shortBreak === m
+                          ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-bold shadow-xs'
+                          : 'bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
+                      }`}
+                    >
+                      {m}m
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Pausa Longa */}
+              <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-2.5 h-2.5 rounded-full shadow-xs"
+                      style={{ backgroundColor: liquidColors.longBreak }}
+                    />
+                    <div>
+                      <span className="text-xs font-semibold text-[var(--text-main,#f3f0ea)]">
+                        Pausa Longa
+                      </span>
+                      <p className="text-[10px] text-[var(--text-dimmed,#78716c)]">Descanso prolongado</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-1 bg-[var(--bg-surface-hover,#221d19)] px-1.5 py-0.5 rounded-md border border-[var(--border-subtle,#26211e)]">
+                    <button
+                      type="button"
+                      onClick={() => setTimerDuration('longBreak', timerDurations.longBreak - 1)}
+                      className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-white hover:bg-white/10 rounded cursor-pointer font-bold text-sm"
+                      title="Diminuir 1 minuto"
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      min={1}
+                      max={90}
+                      value={timerDurations.longBreak}
+                      onChange={(e) => setTimerDuration('longBreak', Number(e.target.value))}
+                      className="w-9 text-center text-xs font-mono font-bold bg-transparent text-[var(--accent-color,#f59e0b)] focus:outline-none"
+                    />
+                    <span className="text-[10px] text-[var(--text-dimmed,#78716c)] pr-0.5">m</span>
+                    <button
+                      type="button"
+                      onClick={() => setTimerDuration('longBreak', timerDurations.longBreak + 1)}
+                      className="w-5 h-5 flex items-center justify-center text-[var(--text-muted)] hover:text-white hover:bg-white/10 rounded cursor-pointer font-bold text-sm"
+                      title="Aumentar 1 minuto"
+                    >
+                      +
+                    </button>
+                  </div>
+                </div>
+
+                {/* Quick Presets */}
+                <div className="flex items-center gap-1.5 pt-0.5 flex-wrap">
+                  <span className="text-[10px] text-[var(--text-dimmed,#78716c)] mr-0.5">Atalhos:</span>
+                  {[10, 15, 20, 25, 30].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setTimerDuration('longBreak', m)}
+                      className={`px-1.5 py-0.5 rounded text-[10px] font-mono cursor-pointer transition-colors ${
+                        timerDurations.longBreak === m
+                          ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-bold shadow-xs'
+                          : 'bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
+                      }`}
+                    >
+                      {m}m
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
+
           {/* ================= SECTION 1: SOM DE CHUVA ================= */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">

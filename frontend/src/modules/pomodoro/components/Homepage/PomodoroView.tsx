@@ -156,6 +156,7 @@ const PomodoroView = () => {
                     setTimeLeft={setTimeLeft}
                     TOTAL_SECONDS={TOTAL_SECONDS}
                     isRealMode={isRealPomodoroMode}
+                    mode="pomodoro"
                 />
             </div>
         </main>
