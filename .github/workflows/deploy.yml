@@ -25,6 +25,7 @@ jobs:
           username: ${{ secrets.VPS_USER || 'root' }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
+          timeout: 120s
           script_stop: true
           script: |
             echo "Iniciando deploy do Enkephalos (enkephalos.mubadev.com.br)..."
