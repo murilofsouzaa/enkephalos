@@ -15,11 +15,11 @@ export const CentralHub: FC = () => {
   };
 
   return (
-    <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] flex flex-col justify-center items-center px-4 select-none transition-colors duration-300">
-      <div className="w-full max-w-4xl flex flex-col items-center justify-center -mt-8">
+    <div className="min-h-[calc(100vh-4rem)] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] flex flex-col justify-center items-center px-4 py-8 lg:py-0 select-none transition-colors duration-300">
+      <div className="w-full max-w-4xl flex flex-col items-center justify-center lg:-mt-8">
         
         {/* Three Giant Action Buttons: Pomodoro, Estudos, Revisões */}
-        <div className="flex flex-col lg:flex-row items-center justify-center gap-12 sm:gap-16 lg:gap-20 my-auto">
+        <div className="flex flex-col lg:flex-row items-center justify-center gap-6 sm:gap-10 lg:gap-16 xl:gap-20">
           
           {/* Button 1: Pomodoro */}
           <motion.div
@@ -38,7 +38,7 @@ export const CentralHub: FC = () => {
               <AnimatedTimerSvg isHovered={hoveredButton === 'pomodoro'} />
 
               {/* Text Underneath */}
-              <span className="mt-6 font-sans text-xl sm:text-2xl font-normal text-[var(--text-muted,#9e9589)] group-hover:text-[var(--accent-color,#f59e0b)] tracking-tight transition-colors duration-300">
+              <span className="mt-2.5 sm:mt-4 lg:mt-6 font-sans text-lg sm:text-xl lg:text-2xl font-normal text-[var(--text-muted,#9e9589)] group-hover:text-[var(--accent-color,#f59e0b)] tracking-tight transition-colors duration-300">
                 Ir para o Pomodoro
               </span>
             </button>
@@ -61,7 +61,7 @@ export const CentralHub: FC = () => {
               <AnimatedBookSvg isHovered={hoveredButton === 'articles'} />
 
               {/* Text Underneath */}
-              <span className="mt-6 font-sans text-xl sm:text-2xl font-normal text-[var(--text-muted,#9e9589)] group-hover:text-[var(--accent-color,#f59e0b)] tracking-tight transition-colors duration-300">
+              <span className="mt-2.5 sm:mt-4 lg:mt-6 font-sans text-lg sm:text-xl lg:text-2xl font-normal text-[var(--text-muted,#9e9589)] group-hover:text-[var(--accent-color,#f59e0b)] tracking-tight transition-colors duration-300">
                 Ir para estudos
               </span>
             </button>
@@ -84,7 +84,7 @@ export const CentralHub: FC = () => {
               <AnimatedCurveSvg isHovered={hoveredButton === 'reviews'} />
 
               {/* Text Underneath */}
-              <span className="mt-6 font-sans text-xl sm:text-2xl font-normal text-[var(--text-muted,#9e9589)] group-hover:text-[var(--accent-color,#f59e0b)] tracking-tight transition-colors duration-300">
+              <span className="mt-2.5 sm:mt-4 lg:mt-6 font-sans text-lg sm:text-xl lg:text-2xl font-normal text-[var(--text-muted,#9e9589)] group-hover:text-[var(--accent-color,#f59e0b)] tracking-tight transition-colors duration-300">
                 Ir para revisões
               </span>
             </button>

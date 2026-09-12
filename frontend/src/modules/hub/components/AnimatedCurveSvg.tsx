@@ -7,7 +7,7 @@ interface AnimatedCurveSvgProps {
 
 export const AnimatedCurveSvg: FC<AnimatedCurveSvgProps> = ({ isHovered }) => {
   return (
-    <div className="relative w-36 h-36 sm:w-44 sm:h-44 flex items-center justify-center select-none">
+    <div className="relative w-32 h-32 sm:w-40 sm:h-40 lg:w-44 lg:h-44 flex items-center justify-center select-none">
       {/* Ambient Glow on Hover */}
       <motion.div
         animate={{
