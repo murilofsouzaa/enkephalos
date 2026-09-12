@@ -1,13 +1,6 @@
-import { createContext, useContext, useState, useRef, type ReactNode, type FC } from 'react';
+import { useState, useRef, type ReactNode, type FC } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-interface TransitionContextType {
-  triggerTransition: (targetPath: string) => void;
-  isTransitioning: boolean;
-  isPegasusFlying?: boolean;
-}
-
-const TransitionContext = createContext<TransitionContextType | undefined>(undefined);
+import { TransitionContext } from './TransitionContextDefinition';
 
 export const TransitionProvider: FC<{ children: ReactNode }> = ({ children }) => {
   const [isTransitioning, setIsTransitioning] = useState(false);
@@ -69,11 +62,3 @@ export const TransitionProvider: FC<{ children: ReactNode }> = ({ children }) =>
     </TransitionContext.Provider>
   );
 };
-
-export function usePageTransition() {
-  const context = useContext(TransitionContext);
-  if (!context) {
-    throw new Error('usePageTransition deve ser usado dentro de um TransitionProvider');
-  }
-  return context;
-}

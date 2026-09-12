@@ -38,11 +38,11 @@ export const PegasusGallop: FC<PegasusGallopProps> = ({
 
   // Golden stardust / hoof embers streaming back from the hooves
   const embers = [
-    { id: 1, top: '78%', left: '35%', delay: 0, scale: 1.2 },
-    { id: 2, top: '82%', left: '28%', delay: 0.15, scale: 0.9 },
-    { id: 3, top: '68%', left: '20%', delay: 0.28, scale: 1.1 },
-    { id: 4, top: '85%', left: '42%', delay: 0.08, scale: 0.8 },
-    { id: 5, top: '74%', left: '15%', delay: 0.2, scale: 1.0 },
+    { id: 1, top: '78%', left: '35%', delay: 0, scale: 1.2, targetX: -105, targetY: 5 },
+    { id: 2, top: '82%', left: '28%', delay: 0.15, scale: 0.9, targetX: -92, targetY: -8 },
+    { id: 3, top: '68%', left: '20%', delay: 0.28, scale: 1.1, targetX: -115, targetY: 12 },
+    { id: 4, top: '85%', left: '42%', delay: 0.08, scale: 0.8, targetX: -88, targetY: -4 },
+    { id: 5, top: '74%', left: '15%', delay: 0.2, scale: 1.0, targetX: -98, targetY: 7 },
   ];
 
   return (
@@ -81,8 +81,8 @@ export const PegasusGallop: FC<PegasusGallopProps> = ({
               key={ember.id}
               initial={{ x: 0, y: 0, opacity: 0 }}
               animate={{
-                x: [-5, -80 - Math.random() * 40],
-                y: [0, 15 - Math.random() * 30],
+                x: [-5, ember.targetX],
+                y: [0, ember.targetY],
                 opacity: [0, 0.9, 0],
                 scale: [ember.scale, ember.scale * 1.3, 0],
               }}

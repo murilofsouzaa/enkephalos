@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { usePomodoroSettings } from '../context/PomodoroSettingsContext';
+import { useState } from 'react';
+import { usePomodoroSettings } from './usePomodoroSettings';
 
 export type TimerMode = 'pomodoro' | 'short_break' | 'long_break';
 
@@ -16,14 +16,16 @@ export function useTimer(mode: TimerMode = 'pomodoro') {
     const TOTAL_SECONDS = Math.max(1, durationMinutes) * 60;
 
     const [timeLeft, setTimeLeft] = useState<number>(TOTAL_SECONDS);
+    const [prevTotalSeconds, setPrevTotalSeconds] = useState<number>(TOTAL_SECONDS);
     const [isFirstTime, setIsFirstTime] = useState<boolean>(true);
     const [isActive, setIsActive] = useState<boolean>(false);
 
-    useEffect(() => {
+    if (prevTotalSeconds !== TOTAL_SECONDS) {
+        setPrevTotalSeconds(TOTAL_SECONDS);
         if (isFirstTime) {
             setTimeLeft(TOTAL_SECONDS);
         }
-    }, [TOTAL_SECONDS, isFirstTime]);
+    }
     
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
@@ -40,6 +42,6 @@ export function useTimer(mode: TimerMode = 'pomodoro') {
         setIsActive,
         minutes,
         seconds,
-        waterPercentage
-    }
+        waterPercentage,
+    };
 }

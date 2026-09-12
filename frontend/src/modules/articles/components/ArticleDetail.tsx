@@ -32,7 +32,7 @@ function makeAccentRegex(query: string): RegExp {
   return new RegExp(`(${pattern})`, 'gi');
 }
 
-export function removeHighlights(root: HTMLElement | null) {
+function removeHighlights(root: HTMLElement | null) {
   if (!root) return;
   const marks = root.querySelectorAll('[data-article-search-match="true"]');
   marks.forEach((mark) => {
@@ -45,7 +45,7 @@ export function removeHighlights(root: HTMLElement | null) {
   root.normalize();
 }
 
-export function highlightInElement(root: HTMLElement | null, searchTerm: string): HTMLElement[] {
+function highlightInElement(root: HTMLElement | null, searchTerm: string): HTMLElement[] {
   if (!root) return [];
   removeHighlights(root);
 
@@ -127,7 +127,7 @@ export function highlightInElement(root: HTMLElement | null, searchTerm: string)
  * Checks whether a URL is a link to an AI conversation or notebook platform
  * (NotebookLM, ChatGPT, Claude, Gemini, Perplexity, DeepSeek, Poe, Copilot, Grok, etc.)
  */
-export function getAiServiceInfo(url: string): { isAi: boolean; serviceName: string } {
+function getAiServiceInfo(url: string): { isAi: boolean; serviceName: string } {
   if (!url) return { isAi: false, serviceName: '' };
   const lower = url.toLowerCase().trim();
 
@@ -197,7 +197,7 @@ function getCensoredUrl(url: string): { visiblePart: string; fadingPart: string 
 /**
  * Strips raw Obsidian metadata header and empty references from markdown
  */
-export function cleanArticleMarkdown(raw: string): string {
+function cleanArticleMarkdown(raw: string): string {
   if (!raw) return '';
   let text = raw
     .replace(/^\s*\d{4}[-/.]\d{2}[-/.]\d{2}(\s+\d{1,2}:\d{2})?\s*\n+/, '')
@@ -540,16 +540,15 @@ export const ArticleDetail: FC = () => {
 
   // Highlight occurrences in DOM when finderQuery or isFinderOpen changes
   useEffect(() => {
-    if (!articleContainerRef.current) return;
+    const container = articleContainerRef.current;
+    if (!container) return;
 
     if (!isFinderOpen || !finderQuery.trim()) {
-      removeHighlights(articleContainerRef.current);
-      setTotalMatches(0);
-      setActiveMatchIndex(0);
+      removeHighlights(container);
       return;
     }
 
-    const matches = highlightInElement(articleContainerRef.current, finderQuery.trim());
+    const matches = highlightInElement(container, finderQuery.trim());
     setTotalMatches(matches.length);
     setActiveMatchIndex(0);
 
@@ -649,8 +648,9 @@ export const ArticleDetail: FC = () => {
 
   // Clean up highlights on unmount or slug change
   useEffect(() => {
+    const container = articleContainerRef.current;
     return () => {
-      removeHighlights(articleContainerRef.current);
+      removeHighlights(container);
     };
   }, [slug]);
 

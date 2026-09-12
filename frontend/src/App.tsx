@@ -1,14 +1,23 @@
+import { lazy, Suspense } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Navbar from './components/layout/Navbar';
-import CentralHub from './modules/hub/CentralHub';
-import ArticlesList from './modules/articles/components/ArticlesList';
-import ArticleDetail from './modules/articles/components/ArticleDetail';
-import PomodoroPage from './modules/pomodoro/PomodoroPage';
 import { TransitionProvider } from './context/TransitionContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { PomodoroSettingsProvider } from './modules/pomodoro/context/PomodoroSettingsContext';
 import { GlobalAudioPlayer } from './modules/pomodoro/components/GlobalAudioPlayer';
 import './App.css';
+
+const CentralHub = lazy(() => import('./modules/hub/CentralHub'));
+const ArticlesList = lazy(() => import('./modules/articles/components/ArticlesList'));
+const ArticleDetail = lazy(() => import('./modules/articles/components/ArticleDetail'));
+const PomodoroPage = lazy(() => import('./modules/pomodoro/PomodoroPage'));
+const StudyPlannerView = lazy(() => import('./modules/study-planner/StudyPlannerView'));
+
+const RouteLoading = () => (
+  <div className="flex items-center justify-center min-h-[60vh]">
+    <div className="w-8 h-8 rounded-full border-2 border-[var(--accent-color,#f59e0b)] border-t-transparent animate-spin" />
+  </div>
+);
 
 function App() {
   return (
@@ -20,27 +29,33 @@ function App() {
               {/* Global Navigation Header */}
               <Navbar />
 
-          {/* Dynamic Route Content */}
-          <main className="flex-1">
-            <Routes>
-              {/* Central Hub: Minimalist home with two giant animated SVG buttons */}
-              <Route path="/" element={<CentralHub />} />
+              {/* Dynamic Route Content */}
+              <main className="flex-1">
+                <Suspense fallback={<RouteLoading />}>
+                  <Routes>
+                    {/* Central Hub: Minimalist home with two giant animated SVG buttons */}
+                    <Route path="/" element={<CentralHub />} />
 
-              {/* Estudos Archive: Single-text stream organized by dates with period sidebar */}
-              <Route path="/estudos" element={<ArticlesList />} />
-              <Route path="/estudos/:slug" element={<ArticleDetail />} />
+                    {/* Estudos Archive: Single-text stream organized by dates with period sidebar */}
+                    <Route path="/estudos" element={<ArticlesList />} />
+                    <Route path="/estudos/:slug" element={<ArticleDetail />} />
 
-              {/* Backward compatibility redirects for /artigos */}
-              <Route path="/artigos" element={<Navigate to="/estudos" replace />} />
-              <Route path="/artigos/:slug" element={<Navigate to="/estudos" replace />} />
+                    {/* Backward compatibility redirects for /artigos */}
+                    <Route path="/artigos" element={<Navigate to="/estudos" replace />} />
+                    <Route path="/artigos/:slug" element={<Navigate to="/estudos" replace />} />
 
-              {/* Pomodoro Timer: Integrated focus timer with modes */}
-              <Route path="/pomodoro" element={<PomodoroPage />} />
+                    {/* Pomodoro Timer: Integrated focus timer with modes */}
+                    <Route path="/pomodoro" element={<PomodoroPage />} />
 
-              {/* Catch-all fallback */}
-              <Route path="*" element={<Navigate to="/" replace />} />
-            </Routes>
-          </main>
+                    {/* Planejador de Revisões & Gráfico da Curva de Hermann Ebbinghaus */}
+                    <Route path="/revisoes" element={<StudyPlannerView />} />
+                    <Route path="/planner" element={<Navigate to="/revisoes" replace />} />
+
+                    {/* Catch-all fallback */}
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </Suspense>
+              </main>
 
               {/* Site-wide Floating Mini Audio Player */}
               <GlobalAudioPlayer />

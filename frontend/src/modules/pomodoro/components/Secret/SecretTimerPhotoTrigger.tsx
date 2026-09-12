@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect, type FC } from 'react';
 import { Heart, Sparkles } from 'lucide-react';
-import { usePomodoroSettings } from '../../context/PomodoroSettingsContext';
+import { usePomodoroSettings } from '../../hooks/usePomodoroSettings';
 
 export const SecretTimerPhotoTrigger: FC = () => {
   const { isSecretPhotosUnlocked, setIsSecretPhotosUnlocked, setIsSettingsOpen } = usePomodoroSettings();

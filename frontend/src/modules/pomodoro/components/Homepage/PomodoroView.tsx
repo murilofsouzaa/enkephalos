@@ -1,13 +1,9 @@
 import { useEffect } from 'react';
 import { useTimer } from '../../hooks/useTimer';
 import Button from '../../ui/Button';
-import { usePomodoroSettings } from '../../context/PomodoroSettingsContext';
+import { usePomodoroSettings } from '../../hooks/usePomodoroSettings';
 import { getTimerDimensions } from '../../utils/timerResponsive';
-
-const timerStart = '/timer-start.mp3';
-const pausedSound = '/timer-paused.mp3';
-const timerEnded = '/timer-ended.mp3';
-const restartSound = '/time-restart.mp3';
+import { playTimerStart, playTimerPaused, playTimerEnded, playTimerRestart } from '../../utils/soundEffects';
 
 const PomodoroView = () => {
     const {
@@ -46,13 +42,7 @@ const PomodoroView = () => {
         }
 
         if (timeLeft === 0) {
-            try {
-                const audio = new Audio(timerEnded);
-                audio.volume = 0.8;
-                audio.play().catch(() => {});
-            } catch {
-                // ignore
-            }
+            playTimerEnded();
         }
         
         return () => clearInterval(timerId as unknown as number);
@@ -60,38 +50,17 @@ const PomodoroView = () => {
 
     const handleStartClick = () => {
         if (!buttonSoundsEnabled) return;
-        try {
-            const audio = new Audio(timerStart);
-            audio.currentTime = 0;
-            audio.volume = 0.7;
-            audio.play().catch(() => {});
-        } catch {
-            // ignore
-        }
+        playTimerStart();
     };
 
     const handlePauseButtonAudio = () => {
         if (!buttonSoundsEnabled) return;
-        try {
-            const audio = new Audio(pausedSound);
-            audio.currentTime = 0;
-            audio.volume = 0.7;
-            audio.play().catch(() => {});
-        } catch {
-            // ignore
-        }
+        playTimerPaused();
     };
 
     const handleRestartButtonAudio = () => {
         if (!buttonSoundsEnabled) return;
-        try {
-            const audio = new Audio(restartSound);
-            audio.currentTime = 0;
-            audio.volume = 0.7;
-            audio.play().catch(() => {});
-        } catch {
-            // ignore
-        }
+        playTimerRestart();
     };
 
     const liquidColor = liquidColors.pomodoro || '#06b6d4';

@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { Play, Pause, RotateCcw, Check } from 'lucide-react';
-import { usePomodoroSettings } from '../context/PomodoroSettingsContext';
-
-const restartSound = '/time-restart.mp3';
-const pausedSound = '/timer-paused.mp3';
+import { usePomodoroSettings } from '../hooks/usePomodoroSettings';
+import { playTimerPaused, playTimerRestart } from '../utils/soundEffects';
 
 interface ButtonProps {
     isFirstTime: boolean;
@@ -56,26 +54,12 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
 
     const handleRestartButtonAudio = () => {
         if (!buttonSoundsEnabled) return;
-        try {
-            const audio = new Audio(restartSound);
-            audio.currentTime = 0;
-            audio.volume = 0.7;
-            audio.play().catch(() => {});
-        } catch {
-            // ignore
-        }
+        playTimerRestart();
     };
 
     const handlePauseButtonAudio = () => {
         if (!buttonSoundsEnabled) return;
-        try {
-            const audio = new Audio(pausedSound);
-            audio.currentTime = 0;
-            audio.volume = 0.7;
-            audio.play().catch(() => {});
-        } catch {
-            // ignore
-        }
+        playTimerPaused();
     };
 
     const handleRestart = (e: React.MouseEvent) => {

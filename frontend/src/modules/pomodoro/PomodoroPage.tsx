@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ModeProvider } from './context/ModeContext';
-import { usePomodoroSettings } from './context/PomodoroSettingsContext';
+import { usePomodoroSettings } from './hooks/usePomodoroSettings';
 import Header from './components/Header/Header';
 import Homepage from './components/Homepage/Homepage';
 import PomodoroSettingsDrawer from './components/Settings/PomodoroSettingsDrawer';

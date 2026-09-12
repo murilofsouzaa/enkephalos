@@ -341,7 +341,7 @@ const FolderTreeNodeView: FC<FolderTreeNodeProps> = ({
 export const ArticlesList: FC = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const queryParam = searchParams.get('q') || '';
-  const [searchTerm, setSearchTerm] = useState(queryParam);
+  const searchTerm = queryParam;
   const [activeSectionId, setActiveSectionId] = useState<string>('');
 
   // View mode: 'timeline' (chronological) vs 'folders' (hierarchy / content structure)
@@ -362,11 +362,6 @@ export const ArticlesList: FC = () => {
     localStorage.setItem('enkephalos_view_mode', mode);
     setActiveSectionId('');
   };
-
-  // Sync state if url query param changes
-  useEffect(() => {
-    setSearchTerm(queryParam);
-  }, [queryParam]);
 
   // Filter out articles with no real content or excluded categories (Português, Biologia)
   const validArticles = useMemo(() => {
@@ -603,7 +598,6 @@ export const ArticlesList: FC = () => {
   };
 
   const handleClearFilters = () => {
-    setSearchTerm('');
     setSearchParams({});
   };
 

@@ -10,14 +10,14 @@ import {
   Heart,
   ChevronDown,
 } from 'lucide-react';
+import { usePomodoroSettings } from '../../hooks/usePomodoroSettings';
 import {
-  usePomodoroSettings,
   AVAILABLE_BACKGROUNDS,
   AVAILABLE_SONGS,
   COLOR_PRESETS,
   AVAILABLE_TIMER_PHOTOS,
   RAIN_AUDIO_URL,
-} from '../../context/PomodoroSettingsContext';
+} from '../../constants';
 
 export const PomodoroSettingsDrawer: FC = () => {
   const {
@@ -63,16 +63,9 @@ export const PomodoroSettingsDrawer: FC = () => {
     return song?.category || 'Lofi';
   });
 
-  const [isMusicEnabled, setIsMusicEnabled] = useState(() => Boolean(selectedSongUrl));
-
-  useEffect(() => {
-    if (selectedSongUrl) {
-      setIsMusicEnabled(true);
-    }
-  }, [selectedSongUrl]);
+  const isMusicEnabled = Boolean(selectedSongUrl);
 
   const handleToggleMusicEnabled = (enabled: boolean) => {
-    setIsMusicEnabled(enabled);
     if (!enabled) {
       setSelectedSongUrl(null);
       setActiveMusicCategory('none');

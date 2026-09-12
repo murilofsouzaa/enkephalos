@@ -14,11 +14,8 @@ import {
   CloudRain,
   Headphones,
 } from 'lucide-react';
-import {
-  usePomodoroSettings,
-  AVAILABLE_SONGS,
-  RAIN_AUDIO_URL,
-} from '../context/PomodoroSettingsContext';
+import { usePomodoroSettings } from '../hooks/usePomodoroSettings';
+import { AVAILABLE_SONGS, RAIN_AUDIO_URL } from '../constants';
 
 export const GlobalAudioPlayer: FC = () => {
   const {

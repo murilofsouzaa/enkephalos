@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef, type FC, type FormEvent } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import { Search, Moon, Sun, Palette, Loader2 } from 'lucide-react';
-import { usePageTransition } from '../../context/TransitionContext';
-import { useTheme } from '../../context/ThemeContext';
+import { Search, Moon, Sun, Palette, Loader2, BookOpen, Timer, BrainCircuit } from 'lucide-react';
+import { usePageTransition } from '../../context/usePageTransition';
+import { useTheme } from '../../context/useTheme';
 
 export const Navbar: FC = () => {
   const { triggerTransition } = usePageTransition();
@@ -41,6 +41,7 @@ export const Navbar: FC = () => {
     const params = new URLSearchParams(location.search);
     const q = params.get('q');
     if (location.pathname === '/estudos') {
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setSearchQuery(q || '');
     }
   }, [location.search, location.pathname]);
@@ -108,16 +109,57 @@ export const Navbar: FC = () => {
   return (
     <header className="w-full border-b border-[var(--border-subtle,#26211e)] bg-[var(--bg-color,#121110)]/95 backdrop-blur-md sticky top-0 z-50 transition-colors duration-300">
       <div className="max-w-6xl mx-auto px-3 sm:px-6 h-16 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Logo / Brand with The Girl Next Door font */}
-        <Link 
-          to="/" 
-          onClick={handleLogoClick}
-          className="group flex items-center gap-2 outline-none select-none shrink-0"
-        >
-          <span className="font-['The_Girl_Next_Door',cursive] text-xl sm:text-3xl font-semibold tracking-wide text-[var(--text-main,#f3f0ea)] group-hover:text-[var(--accent-color)] transition-colors leading-none pt-1">
-            Enkephalos
-          </span>
-        </Link>
+        <div className="flex items-center gap-3 sm:gap-6">
+          {/* Logo / Brand with The Girl Next Door font */}
+          <Link 
+            to="/" 
+            onClick={handleLogoClick}
+            className="group flex items-center gap-2 outline-none select-none shrink-0"
+          >
+            <span className="font-['The_Girl_Next_Door',cursive] text-xl sm:text-3xl font-semibold tracking-wide text-[var(--text-main,#f3f0ea)] group-hover:text-[var(--accent-color)] transition-colors leading-none pt-1">
+              Enkephalos
+            </span>
+          </Link>
+
+          {/* Navigation Links */}
+          <nav className="hidden md:flex items-center gap-1 text-xs font-sans">
+            <Link
+              to="/estudos"
+              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                location.pathname.startsWith('/estudos')
+                  ? 'bg-[var(--accent-muted)] text-[var(--accent-color)] font-semibold shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5" />
+              <span>Estudos</span>
+            </Link>
+
+            <Link
+              to="/pomodoro"
+              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                location.pathname.startsWith('/pomodoro')
+                  ? 'bg-[var(--accent-muted)] text-[var(--accent-color)] font-semibold shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+              }`}
+            >
+              <Timer className="w-3.5 h-3.5" />
+              <span>Pomodoro</span>
+            </Link>
+
+            <Link
+              to="/revisoes"
+              className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 ${
+                location.pathname.startsWith('/revisoes')
+                  ? 'bg-[var(--accent-muted)] text-[var(--accent-color)] font-semibold shadow-sm'
+                  : 'text-[var(--text-muted)] hover:text-[var(--text-main)] hover:bg-[var(--bg-surface-hover)]'
+              }`}
+            >
+              <BrainCircuit className="w-3.5 h-3.5" />
+              <span>Revisões</span>
+            </Link>
+          </nav>
+        </div>
 
         {/* Right side controls: Netflix search input, GitHub, Theme Palette, Dark/Light mode */}
         <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
