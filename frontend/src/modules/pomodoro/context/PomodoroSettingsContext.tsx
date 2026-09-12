@@ -129,7 +129,7 @@ export const AVAILABLE_SONGS: SongOption[] = [
 ];
 
 export const COLOR_PRESETS = [
-  { label: 'Ciano', value: '#06b6d4' },
+  { label: 'Verde Água', value: '#06b6d4' },
   { label: 'Azul Elétrico', value: '#2563eb' },
   { label: 'Esmeralda', value: '#10b981' },
   { label: 'Âmbar', value: '#f59e0b' },

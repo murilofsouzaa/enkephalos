@@ -14,7 +14,7 @@ Disponível em: **[enkephalos.mubadev.com.br](https://enkephalos.mubadev.com.br)
   - Modos Pomodoro, Pausa Curta e Pausa Longa com ajuste direto no cronômetro.
   - Modo rígido: sem pausas artificiais e reinício ao interromper.
   - Sons ambientes (chuva contínua) e efeitos sonoros de transição.
-- **Paleta de Cores Dinâmica Global**: Seletor com 6 paletas de destaque (*Azul*, *Âmbar Ouro*, *Esmeralda*, *Violeta*, *Ciano*, *Rosa Coral*) e alternância entre Temas Claro e Escuro.
+- **Paleta de Cores Dinâmica Global**: Seletor com 6 paletas de destaque (*Verde Água (Padrão)*, *Azul*, *Âmbar Ouro*, *Esmeralda*, *Violeta*, *Rosa Coral*) e alternância entre Temas Claro e Escuro.
 
 ---
 
