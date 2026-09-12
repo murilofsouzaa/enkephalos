@@ -6,16 +6,19 @@ import ArticleDetail from './modules/articles/components/ArticleDetail';
 import PomodoroPage from './modules/pomodoro/PomodoroPage';
 import { TransitionProvider } from './context/TransitionContext';
 import { ThemeProvider } from './context/ThemeContext';
+import { PomodoroSettingsProvider } from './modules/pomodoro/context/PomodoroSettingsContext';
+import { GlobalAudioPlayer } from './modules/pomodoro/components/GlobalAudioPlayer';
 import './App.css';
 
 function App() {
   return (
     <Router>
       <ThemeProvider>
-        <TransitionProvider>
-          <div className="min-h-screen bg-[var(--bg-color)] text-[var(--text-main)] flex flex-col font-sans selection:bg-[var(--accent-muted)] selection:text-[var(--accent-color)] transition-colors duration-300">
-            {/* Global Navigation Header */}
-            <Navbar />
+        <PomodoroSettingsProvider>
+          <TransitionProvider>
+            <div className="min-h-screen bg-[var(--bg-color)] text-[var(--text-main)] flex flex-col font-sans selection:bg-[var(--accent-muted)] selection:text-[var(--accent-color)] transition-colors duration-300">
+              {/* Global Navigation Header */}
+              <Navbar />
 
           {/* Dynamic Route Content */}
           <main className="flex-1">
@@ -38,11 +41,15 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
           </main>
-        </div>
-      </TransitionProvider>
-    </ThemeProvider>
-  </Router>
-);
+
+              {/* Site-wide Floating Mini Audio Player */}
+              <GlobalAudioPlayer />
+            </div>
+          </TransitionProvider>
+        </PomodoroSettingsProvider>
+      </ThemeProvider>
+    </Router>
+  );
 }
 
 export default App;

@@ -353,6 +353,8 @@ interface PomodoroSettingsContextType {
   isMusicPlaying: boolean;
   setIsMusicPlaying: (playing: boolean) => void;
   toggleMusicPlaying: () => void;
+  nextSong: () => void;
+  prevSong: () => void;
   selectedAmbientUrl: string | null;
   setSelectedAmbientUrl: (url: string | null) => void;
   ambientVolume: number;
@@ -553,6 +555,20 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
     setIsMusicPlaying((prev) => !prev);
   };
 
+  const nextSong = () => {
+    if (AVAILABLE_SONGS.length === 0) return;
+    const currentIndex = AVAILABLE_SONGS.findIndex((s) => s.url === settings.selectedSongUrl);
+    const nextIndex = currentIndex === -1 ? 0 : (currentIndex + 1) % AVAILABLE_SONGS.length;
+    setSelectedSongUrl(AVAILABLE_SONGS[nextIndex].url);
+  };
+
+  const prevSong = () => {
+    if (AVAILABLE_SONGS.length === 0) return;
+    const currentIndex = AVAILABLE_SONGS.findIndex((s) => s.url === settings.selectedSongUrl);
+    const prevIndex = currentIndex <= 0 ? AVAILABLE_SONGS.length - 1 : currentIndex - 1;
+    setSelectedSongUrl(AVAILABLE_SONGS[prevIndex].url);
+  };
+
   const setSelectedAmbientUrl = (selectedAmbientUrl: string | null) => {
     setSettings((prev: typeof settings) => ({ ...prev, selectedAmbientUrl }));
     if (selectedAmbientUrl) {
@@ -633,6 +649,8 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
         isMusicPlaying,
         setIsMusicPlaying,
         toggleMusicPlaying,
+        nextSong,
+        prevSong,
         selectedAmbientUrl: settings.selectedAmbientUrl,
         setSelectedAmbientUrl,
         ambientVolume: settings.ambientVolume,

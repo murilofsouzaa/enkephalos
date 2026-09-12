@@ -1,7 +1,7 @@
 import { type FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ModeProvider } from './context/ModeContext';
-import { PomodoroSettingsProvider, usePomodoroSettings } from './context/PomodoroSettingsContext';
+import { usePomodoroSettings } from './context/PomodoroSettingsContext';
 import Header from './components/Header/Header';
 import Homepage from './components/Homepage/Homepage';
 import PomodoroSettingsDrawer from './components/Settings/PomodoroSettingsDrawer';
@@ -71,11 +71,9 @@ const PomodoroContent: FC = () => {
 
 export const PomodoroPage: FC = () => {
   return (
-    <PomodoroSettingsProvider>
-      <ModeProvider>
-        <PomodoroContent />
-      </ModeProvider>
-    </PomodoroSettingsProvider>
+    <ModeProvider>
+      <PomodoroContent />
+    </ModeProvider>
   );
 };
 

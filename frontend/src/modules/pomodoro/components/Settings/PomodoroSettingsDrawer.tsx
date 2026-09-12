@@ -16,6 +16,7 @@ import {
   AVAILABLE_SONGS,
   COLOR_PRESETS,
   AVAILABLE_TIMER_PHOTOS,
+  RAIN_AUDIO_URL,
 } from '../../context/PomodoroSettingsContext';
 
 export const PomodoroSettingsDrawer: FC = () => {
@@ -40,6 +41,10 @@ export const PomodoroSettingsDrawer: FC = () => {
     setMusicVolume,
     isMusicPlaying,
     toggleMusicPlaying,
+    selectedAmbientUrl,
+    setSelectedAmbientUrl,
+    ambientVolume,
+    setAmbientVolume,
     selectedTimerPhoto,
     setSelectedTimerPhoto,
     isSecretPhotosUnlocked,
@@ -57,6 +62,29 @@ export const PomodoroSettingsDrawer: FC = () => {
     const song = AVAILABLE_SONGS.find((s) => s.url === selectedSongUrl);
     return song?.category || 'Lofi';
   });
+
+  const [isMusicEnabled, setIsMusicEnabled] = useState(() => Boolean(selectedSongUrl));
+
+  useEffect(() => {
+    if (selectedSongUrl) {
+      setIsMusicEnabled(true);
+    }
+  }, [selectedSongUrl]);
+
+  const handleToggleMusicEnabled = (enabled: boolean) => {
+    setIsMusicEnabled(enabled);
+    if (!enabled) {
+      setSelectedSongUrl(null);
+      setActiveMusicCategory('none');
+    } else {
+      const targetCategory = activeMusicCategory === 'none' ? 'Lofi' : activeMusicCategory;
+      setActiveMusicCategory(targetCategory);
+      const songToPlay = AVAILABLE_SONGS.find((s) => s.category === targetCategory) || AVAILABLE_SONGS[0];
+      if (songToPlay) {
+        setSelectedSongUrl(songToPlay.url);
+      }
+    }
+  };
 
   const currentSong = AVAILABLE_SONGS.find((s) => s.url === selectedSongUrl);
 
@@ -127,6 +155,77 @@ export const PomodoroSettingsDrawer: FC = () => {
         {/* Single Main Scroll Body with Sleek Custom Scrollbar (NO inner sub-scrollbars) */}
         <div className="flex-1 overflow-y-auto px-6 py-6 space-y-7 custom-scrollbar text-xs font-['Lexend',sans-serif]">
           
+          {/* ================= SOM DE CHUVA ================= */}
+          <section className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted,#9e9589)]">
+                Som de Chuva
+              </h4>
+              {selectedAmbientUrl && (
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
+                  Ativo
+                </span>
+              )}
+            </div>
+
+            {/* Rain Toggle Card */}
+            <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg flex items-center justify-between">
+              <div className="space-y-0.5 pr-2">
+                <p className="text-xs font-medium text-[var(--text-main,#f3f0ea)]">
+                  Chuva para Concentração
+                </p>
+                <p className="text-[11px] text-[var(--text-dimmed,#78716c)]">
+                  {selectedAmbientUrl
+                    ? 'Áudio de chuva ambiente ativo'
+                    : 'Som de chuva desativado'}
+                </p>
+              </div>
+
+              <div className="flex items-center gap-2.5 shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (selectedAmbientUrl) {
+                      setSelectedAmbientUrl(null);
+                    } else {
+                      setSelectedAmbientUrl(RAIN_AUDIO_URL);
+                    }
+                  }}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                    selectedAmbientUrl ? 'bg-[var(--accent-color,#f59e0b)]' : 'bg-[var(--border-subtle,#2d2723)]'
+                  }`}
+                  title={selectedAmbientUrl ? 'Desligar som de chuva' : 'Ligar som de chuva'}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      selectedAmbientUrl ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+            </div>
+
+            {/* Rain Volume Slider */}
+            {selectedAmbientUrl && (
+              <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2 animate-in fade-in duration-200">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="text-[var(--text-muted,#9e9589)]">Volume da Chuva</span>
+                  <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[var(--accent-color,#f59e0b)]">
+                    {ambientVolume}%
+                  </span>
+                </div>
+                <input
+                  type="range"
+                  min="0"
+                  max="100"
+                  value={ambientVolume}
+                  onChange={(e) => setAmbientVolume(Number(e.target.value))}
+                  className="w-full accent-[var(--accent-color,#f59e0b)] cursor-pointer"
+                />
+              </div>
+            )}
+          </section>
+
           {/* ================= SECTION 1: 4K BACKGROUND IMAGES ================= */}
           <section className="space-y-3">
             <div className="flex items-center justify-between">
@@ -582,126 +681,160 @@ export const PomodoroSettingsDrawer: FC = () => {
               <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-muted,#9e9589)]">
                 Músicas de Foco (Songs)
               </h4>
-              {selectedSongUrl && (
+              {selectedSongUrl && isMusicEnabled && (
                 <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
                   {isMusicPlaying ? 'Tocando' : 'Pausada'}
                 </span>
               )}
             </div>
 
-            {/* Volume Control */}
-            <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2">
-              <div className="flex items-center justify-between text-[11px]">
-                <span className="text-[var(--text-muted,#9e9589)]">Volume da Música</span>
-                <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[var(--accent-color,#f59e0b)]">
-                  {musicVolume}%
-                </span>
+            {/* Toggle Card: Habilitar Música */}
+            <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg flex items-center justify-between">
+              <div className="space-y-0.5 pr-2">
+                <p className="text-xs font-medium text-[var(--text-main,#f3f0ea)]">
+                  Habilitar Música
+                </p>
+                <p className="text-[11px] text-[var(--text-dimmed,#78716c)]">
+                  {isMusicEnabled
+                    ? 'Músicas de foco ativadas'
+                    : 'Músicas desativadas'}
+                </p>
               </div>
-              <input
-                type="range"
-                min="0"
-                max="100"
-                value={musicVolume}
-                onChange={(e) => setMusicVolume(Number(e.target.value))}
-                className="w-full accent-[var(--accent-color,#f59e0b)] cursor-pointer"
-              />
+
+              <button
+                type="button"
+                onClick={() => handleToggleMusicEnabled(!isMusicEnabled)}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors cursor-pointer ${
+                  isMusicEnabled ? 'bg-[var(--accent-color,#f59e0b)]' : 'bg-[var(--border-subtle,#2d2723)]'
+                }`}
+                title={isMusicEnabled ? 'Desabilitar música' : 'Habilitar música'}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    isMusicEnabled ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
             </div>
 
-            {/* Active Song Control Bar */}
-            {selectedSongUrl && currentSong && (
-              <div className="p-3 bg-[var(--accent-muted,rgba(245,158,11,0.08))] border border-[var(--accent-color,#f59e0b)]/30 rounded-lg flex items-center justify-between">
-                <div className="flex items-center gap-2.5 truncate mr-2">
-                  <button
-                    type="button"
-                    onClick={toggleMusicPlaying}
-                    className="w-6 h-6 rounded-full bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center shrink-0 hover:scale-105 transition-transform cursor-pointer"
-                  >
-                    {isMusicPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 ml-0.5" />}
-                  </button>
-                  <div className="truncate">
-                    <p className="text-xs font-semibold text-[var(--text-main,#f3f0ea)] truncate">
-                      {currentSong.title}
-                    </p>
-                    <p className="text-[10px] text-[var(--accent-color,#f59e0b)]">
-                      {currentSong.category}
-                    </p>
+            {/* Opções de Música: aparecem somente se a música estiver habilitada */}
+            {isMusicEnabled && (
+              <div className="space-y-3 animate-in fade-in duration-200">
+                {/* Volume Control */}
+                <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2">
+                  <div className="flex items-center justify-between text-[11px]">
+                    <span className="text-[var(--text-muted,#9e9589)]">Volume da Música</span>
+                    <span className="font-['Lexend',sans-serif] font-semibold text-[10px] text-[var(--accent-color,#f59e0b)]">
+                      {musicVolume}%
+                    </span>
                   </div>
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    value={musicVolume}
+                    onChange={(e) => setMusicVolume(Number(e.target.value))}
+                    className="w-full accent-[var(--accent-color,#f59e0b)] cursor-pointer"
+                  />
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    setSelectedSongUrl(null);
-                    setActiveMusicCategory('none');
-                  }}
-                  className="text-[10px] font-medium text-[var(--text-dimmed,#78716c)] hover:text-red-400 transition-colors cursor-pointer shrink-0"
-                >
-                  Desligar
-                </button>
-              </div>
-            )}
+                {/* Active Song Control Bar */}
+                {selectedSongUrl && currentSong && (
+                  <div className="p-3 bg-[var(--accent-muted,rgba(245,158,11,0.08))] border border-[var(--accent-color,#f59e0b)]/30 rounded-lg flex items-center justify-between">
+                    <div className="flex items-center gap-2.5 truncate mr-2">
+                      <button
+                        type="button"
+                        onClick={toggleMusicPlaying}
+                        className="w-6 h-6 rounded-full bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center shrink-0 hover:scale-105 transition-transform cursor-pointer"
+                      >
+                        {isMusicPlaying ? <Pause className="w-3 h-3" /> : <Play className="w-3 h-3 ml-0.5" />}
+                      </button>
+                      <div className="truncate">
+                        <p className="text-xs font-semibold text-[var(--text-main,#f3f0ea)] truncate">
+                          {currentSong.title}
+                        </p>
+                        <p className="text-[10px] text-[var(--accent-color,#f59e0b)]">
+                          {currentSong.category}
+                        </p>
+                      </div>
+                    </div>
 
-            {/* Category Selector Tabs: Silêncio / Lofi / Øneheart / Celtic / Jazz */}
-            <div className="grid grid-cols-3 sm:grid-cols-5 gap-1 p-1 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg">
-              {[
-                { id: 'none', label: 'Silêncio' },
-                { id: 'Lofi', label: 'Lofi' },
-                { id: 'Øneheart', label: 'Øneheart' },
-                { id: 'Celtic', label: 'Celtic' },
-                { id: 'Jazz', label: 'Jazz' },
-              ].map((cat) => {
-                const isActive = (cat.id === 'none' && selectedSongUrl === null && activeMusicCategory === 'none') || (activeMusicCategory === cat.id && cat.id !== 'none');
-                return (
-                  <button
-                    key={cat.id}
-                    type="button"
-                    onClick={() => {
-                      if (cat.id === 'none') {
+                    <button
+                      type="button"
+                      onClick={() => {
                         setSelectedSongUrl(null);
                         setActiveMusicCategory('none');
-                      } else {
-                        setActiveMusicCategory(cat.id);
-                      }
-                    }}
-                    className={`py-1.5 text-center text-[11px] font-medium rounded-md transition-all cursor-pointer truncate ${
-                      isActive
-                        ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-semibold shadow-sm'
-                        : 'text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
-                    }`}
-                  >
-                    {cat.label}
-                  </button>
-                );
-              })}
-            </div>
-
-            {/* Song Cards */}
-            {activeMusicCategory === 'none' && (
-              <div className="p-3 bg-[var(--bg-surface,#171412)]/50 border border-[var(--border-subtle,#26211e)] rounded-lg text-center text-[11px] text-[var(--text-dimmed,#78716c)]">
-                Foco em silêncio ativado. Selecione um estilo acima para tocar músicas.
-              </div>
-            )}
-
-            {activeMusicCategory !== 'none' && (
-              <div className="space-y-1.5 animate-in fade-in duration-150">
-                {AVAILABLE_SONGS.filter((s) => s.category === activeMusicCategory).map((song) => {
-                  const isSelected = selectedSongUrl === song.url;
-                  return (
-                    <button
-                      key={song.id}
-                      type="button"
-                      onClick={() => setSelectedSongUrl(song.url)}
-                      className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between cursor-pointer ${
-                        isSelected
-                          ? 'border-[var(--accent-color,#f59e0b)] bg-[var(--accent-muted,rgba(245,158,11,0.12))] shadow-sm'
-                          : 'border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-surface-hover,#1f1b18)]'
-                      }`}
+                      }}
+                      className="text-[10px] font-medium text-[var(--text-dimmed,#78716c)] hover:text-red-400 transition-colors cursor-pointer shrink-0"
                     >
-                      <span className="truncate pr-2 font-medium">{song.title}</span>
-                      {isSelected && <Check className="w-3.5 h-3.5 text-[var(--accent-color,#f59e0b)] shrink-0" />}
+                      Desligar
                     </button>
-                  );
-                })}
+                  </div>
+                )}
+
+                {/* Category Selector Tabs: Silêncio / Lofi / Øneheart / Celtic / Jazz */}
+                <div className="grid grid-cols-3 sm:grid-cols-5 gap-1 p-1 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg">
+                  {[
+                    { id: 'none', label: 'Silêncio' },
+                    { id: 'Lofi', label: 'Lofi' },
+                    { id: 'Øneheart', label: 'Øneheart' },
+                    { id: 'Celtic', label: 'Celtic' },
+                    { id: 'Jazz', label: 'Jazz' },
+                  ].map((cat) => {
+                    const isActive = (cat.id === 'none' && selectedSongUrl === null && activeMusicCategory === 'none') || (activeMusicCategory === cat.id && cat.id !== 'none');
+                    return (
+                      <button
+                        key={cat.id}
+                        type="button"
+                        onClick={() => {
+                          if (cat.id === 'none') {
+                            setSelectedSongUrl(null);
+                            setActiveMusicCategory('none');
+                          } else {
+                            setActiveMusicCategory(cat.id);
+                          }
+                        }}
+                        className={`py-1.5 text-center text-[11px] font-medium rounded-md transition-all cursor-pointer truncate ${
+                          isActive
+                            ? 'bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] font-semibold shadow-sm'
+                            : 'text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
+                        }`}
+                      >
+                        {cat.label}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Song Cards */}
+                {activeMusicCategory === 'none' && (
+                  <div className="p-3 bg-[var(--bg-surface,#171412)]/50 border border-[var(--border-subtle,#26211e)] rounded-lg text-center text-[11px] text-[var(--text-dimmed,#78716c)]">
+                    Foco em silêncio ativado. Selecione um estilo acima para tocar músicas.
+                  </div>
+                )}
+
+                {activeMusicCategory !== 'none' && (
+                  <div className="space-y-1.5 animate-in fade-in duration-150">
+                    {AVAILABLE_SONGS.filter((s) => s.category === activeMusicCategory).map((song) => {
+                      const isSelected = selectedSongUrl === song.url;
+                      return (
+                        <button
+                          key={song.id}
+                          type="button"
+                          onClick={() => setSelectedSongUrl(song.url)}
+                          className={`w-full text-left p-2.5 rounded-lg border transition-all flex items-center justify-between cursor-pointer ${
+                            isSelected
+                              ? 'border-[var(--accent-color,#f59e0b)] bg-[var(--accent-muted,rgba(245,158,11,0.12))] shadow-sm'
+                              : 'border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)] hover:border-[var(--text-muted)] hover:bg-[var(--bg-surface-hover,#1f1b18)]'
+                          }`}
+                        >
+                          <span className="truncate pr-2 font-medium">{song.title}</span>
+                          {isSelected && <Check className="w-3.5 h-3.5 text-[var(--accent-color,#f59e0b)] shrink-0" />}
+                        </button>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
             )}
           </section>
