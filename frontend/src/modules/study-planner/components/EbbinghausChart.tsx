@@ -703,7 +703,7 @@ export const EbbinghausChart: FC<EbbinghausChartProps> = ({
                 fill="var(--accent-color, #0891b2)"
               />
               <rect
-                x={getX(hoveredDay) - 38}
+                x={Math.max(marginLeft + 38, Math.min(width - marginRight - 38, getX(hoveredDay))) - 38}
                 y={height - marginBottom + 4}
                 width="76"
                 height="20"
@@ -711,7 +711,7 @@ export const EbbinghausChart: FC<EbbinghausChartProps> = ({
                 fill="var(--accent-color, #0891b2)"
               />
               <text
-                x={getX(hoveredDay)}
+                x={Math.max(marginLeft + 38, Math.min(width - marginRight - 38, getX(hoveredDay)))}
                 y={height - marginBottom + 18}
                 textAnchor="middle"
                 className="fill-white font-sans text-[12px] font-bold select-none"
@@ -726,62 +726,79 @@ export const EbbinghausChart: FC<EbbinghausChartProps> = ({
           )}
         </svg>
 
-        {/* Floating Tooltip HTML Overlay ao passar o mouse */}
-        {hoveredDay !== null && subjects.length > 0 && (
-          <div
-            className="absolute top-3 pointer-events-none z-20 bg-[var(--bg-surface,#191614)] border border-[var(--border-subtle,#292421)] rounded-md p-2.5 shadow-xl backdrop-blur-md min-w-[200px]"
-            style={{
-              left: `${Math.min(
-                82,
-                Math.max(16, ((getX(hoveredDay)) / width) * 100)
-              )}%`,
-              transform: 'translateX(-50%)',
-            }}
-          >
-            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-1 mb-2">
-              <span className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
-                <Clock className="w-3.5 h-3.5 text-[var(--accent-color)]" aria-hidden="true" />
-                {formatHoverTime(hoveredDay)}
-              </span>
-              <span className="text-[10px] text-[var(--text-dimmed)]">
-                Retenção estimada
-              </span>
-            </div>
+        {/* Floating Tooltip HTML Overlay ao passar o mouse ou clicar no gráfico */}
+        {hoveredDay !== null && subjects.length > 0 && (() => {
+          const pct = (getX(hoveredDay) / width) * 100;
+          let tooltipStyle: React.CSSProperties;
 
-            <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
-              {visibleSubjects.map((sub) => {
-                const ret = getRetentionAtDay(sub, hoveredDay, baseDaysToForget);
-                const isUnderThreshold = ret < 80;
-                return (
-                  <div 
-                    key={sub.id} 
-                    onClick={() => onSelectSubject(sub.id)}
-                    className="flex items-center justify-between text-xs gap-3 cursor-pointer hover:bg-[var(--bg-color)] p-1 rounded transition-colors"
-                  >
-                    <div className="flex items-center gap-1.5 truncate">
+          if (isMobile) {
+            if (pct < 38) {
+              tooltipStyle = { left: '8px', right: 'auto', transform: 'none' };
+            } else if (pct > 62) {
+              tooltipStyle = { right: '8px', left: 'auto', transform: 'none' };
+            } else {
+              tooltipStyle = { left: `${pct}%`, right: 'auto', transform: 'translateX(-50%)' };
+            }
+          } else {
+            if (pct < 20) {
+              tooltipStyle = { left: '16px', right: 'auto', transform: 'none' };
+            } else if (pct > 80) {
+              tooltipStyle = { right: '16px', left: 'auto', transform: 'none' };
+            } else {
+              tooltipStyle = { left: `${pct}%`, right: 'auto', transform: 'translateX(-50%)' };
+            }
+          }
+
+          return (
+            <div
+              className="absolute top-2.5 pointer-events-none z-20 bg-[var(--bg-surface,#191614)] border border-[var(--border-subtle,#292421)] rounded-md p-2 sm:p-2.5 shadow-xl backdrop-blur-md min-w-[190px] sm:min-w-[210px] max-w-[calc(100%-16px)]"
+              style={tooltipStyle}
+            >
+              <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-1 mb-2">
+                <span className="text-xs font-semibold text-[var(--text-main)] flex items-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5 text-[var(--accent-color)]" aria-hidden="true" />
+                  {formatHoverTime(hoveredDay)}
+                </span>
+                <span className="text-[10px] text-[var(--text-dimmed)]">
+                  Retenção estimada
+                </span>
+              </div>
+
+              <div className="space-y-1.5 max-h-[160px] overflow-y-auto">
+                {visibleSubjects.map((sub) => {
+                  const ret = getRetentionAtDay(sub, hoveredDay, baseDaysToForget);
+                  const isUnderThreshold = ret < 80;
+                  return (
+                    <div 
+                      key={sub.id} 
+                      onClick={() => onSelectSubject(sub.id)}
+                      className="flex items-center justify-between text-xs gap-3 cursor-pointer hover:bg-[var(--bg-color)] p-1 rounded transition-colors"
+                    >
+                      <div className="flex items-center gap-1.5 truncate">
+                        <span
+                          className="w-2 h-2 rounded-full shrink-0"
+                          style={{ backgroundColor: sub.color }}
+                        />
+                        <span className="truncate text-[var(--text-main)] font-medium max-w-[130px] sm:max-w-[190px]">
+                          {sub.title}
+                        </span>
+                      </div>
                       <span
-                        className="w-2 h-2 rounded-full shrink-0"
-                        style={{ backgroundColor: sub.color }}
-                      />
-                      <span className="truncate text-[var(--text-main)] font-medium">
-                        {sub.title}
+                        className={`font-semibold shrink-0 ${
+                          isUnderThreshold
+                            ? 'text-amber-500 dark:text-amber-400'
+                            : 'text-emerald-600 dark:text-emerald-400'
+                        }`}
+                      >
+                        {ret.toFixed(1)}%
                       </span>
                     </div>
-                    <span
-                      className={`font-semibold shrink-0 ${
-                        isUnderThreshold
-                          ? 'text-amber-500 dark:text-amber-400'
-                          : 'text-emerald-600 dark:text-emerald-400'
-                      }`}
-                    >
-                      {ret.toFixed(1)}%
-                    </span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Tópicos para Modo Agregado (Mobile: posicionado abaixo do gráfico para organização) */}
