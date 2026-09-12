@@ -27,30 +27,9 @@ jobs:
           port: ${{ secrets.VPS_PORT || 22 }}
           script_stop: true
           script: |
-            echo "🚀 Iniciando deploy do Enkephalos (enkephalos.mubadev.com.br)..."
-
-            DEPLOY_DIR="/var/www/enkephalos"
-
-            # 1. Garante que o diretório de destino existe e sincroniza o repositório
-            if [ ! -d "$DEPLOY_DIR/.git" ]; then
-              echo "📦 Clonando repositório pela primeira vez em $DEPLOY_DIR..."
-              mkdir -p "$DEPLOY_DIR"
-              git clone https://github.com/murilofsouzaa/enkephalos.git "$DEPLOY_DIR"
-              cd "$DEPLOY_DIR"
-            else
-              echo "🔄 Atualizando código existente em $DEPLOY_DIR..."
-              cd "$DEPLOY_DIR"
-              git fetch origin main
-              git reset --hard origin/main
-            fi
-
-            # 2. Build e inicialização dos containers Docker
-            echo "🐳 Subindo containers via Docker Compose..."
-            docker compose down --remove-orphans || true
-            docker compose up -d --build
-
-            # 3. Limpeza de imagens antigas sem tag para economizar disco
-            echo "🧹 Limpando imagens Docker antigas..."
-            docker image prune -f
-
-            echo "✅ Deploy concluído com sucesso em enkephalos.mubadev.com.br!"
+            echo "Iniciando deploy do Enkephalos (enkephalos.mubadev.com.br)..."
+            mkdir -p /var/www
+            if [ ! -d "/var/www/enkephalos/.git" ]; then rm -rf /var/www/enkephalos && git clone https://github.com/murilofsouzaa/enkephalos.git /var/www/enkephalos; fi
+            cd /var/www/enkephalos && git fetch origin main && git reset --hard origin/main && git clean -fd
+            chmod +x /var/www/enkephalos/scripts/deploy.sh
+            /var/www/enkephalos/scripts/deploy.sh
