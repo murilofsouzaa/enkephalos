@@ -8,6 +8,7 @@ import {
   RotateCcw,
   Check,
   Heart,
+  ChevronDown,
 } from 'lucide-react';
 import {
   usePomodoroSettings,
@@ -29,6 +30,8 @@ export const PomodoroSettingsDrawer: FC = () => {
     setIsRealPomodoroMode,
     selectedBackground,
     setSelectedBackground,
+    backgroundBlur,
+    setBackgroundBlur,
     ballSize,
     setBallSize,
     selectedSongUrl,
@@ -46,6 +49,7 @@ export const PomodoroSettingsDrawer: FC = () => {
   } = usePomodoroSettings();
 
   const [activeColorTab, setActiveColorTab] = useState<'pomodoro' | 'shortBreak' | 'longBreak'>('pomodoro');
+  const [isAllBackgroundsExpanded, setIsAllBackgroundsExpanded] = useState(false);
   
   // Track active music category tab ('none' | 'Lofi' | 'Øneheart' | 'Celtic' | 'Jazz')
   const [activeMusicCategory, setActiveMusicCategory] = useState<string>(() => {
@@ -130,8 +134,52 @@ export const PomodoroSettingsDrawer: FC = () => {
                 Plano de Fundo (Wallpapers 4K)
               </h4>
               <span className="text-[10px] text-[var(--accent-color,#f59e0b)] font-['Lexend',sans-serif] font-medium tracking-wide">
-                Sem desfoque
+                {backgroundBlur === 0 ? 'Sem desfoque' : `Desfoque: ${backgroundBlur}px`}
               </span>
+            </div>
+
+            {/* Controle de Grau de Desfoque Alternável */}
+            <div className="p-3 bg-[var(--bg-surface,#171412)] border border-[var(--border-subtle,#26211e)] rounded-lg space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-medium text-[var(--text-muted,#9e9589)]">
+                  Nível de Desfoque
+                </span>
+                <span className="text-[11px] font-['Lexend',sans-serif] font-semibold text-[var(--accent-color,#f59e0b)]">
+                  {backgroundBlur === 0 ? 'Nítido (0px)' : `${backgroundBlur}px`}
+                </span>
+              </div>
+
+              <input
+                type="range"
+                min="0"
+                max="24"
+                step="1"
+                value={backgroundBlur}
+                onChange={(e) => setBackgroundBlur(Number(e.target.value))}
+                className="w-full accent-[var(--accent-color,#f59e0b)] cursor-pointer"
+              />
+
+              <div className="grid grid-cols-4 gap-1.5">
+                {[
+                  { label: 'Nenhum', value: 0 },
+                  { label: 'Leve', value: 4 },
+                  { label: 'Médio', value: 8 },
+                  { label: 'Forte', value: 16 },
+                ].map((item) => (
+                  <button
+                    key={item.value}
+                    type="button"
+                    onClick={() => setBackgroundBlur(item.value)}
+                    className={`py-1 text-[10px] font-medium rounded border transition-colors cursor-pointer text-center ${
+                      backgroundBlur === item.value
+                        ? 'border-[var(--accent-color,#f59e0b)] bg-[var(--accent-muted,rgba(245,158,11,0.1))] text-[var(--accent-color,#f59e0b)] font-semibold'
+                        : 'border-[var(--border-subtle,#26211e)] text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)]'
+                    }`}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
             </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -155,8 +203,8 @@ export const PomodoroSettingsDrawer: FC = () => {
                 )}
               </button>
 
-              {/* Background Options from public/backgrounds */}
-              {AVAILABLE_BACKGROUNDS.map((bg) => {
+              {/* Background Options from public/backgrounds (first 5 or all if expanded) */}
+              {(isAllBackgroundsExpanded ? AVAILABLE_BACKGROUNDS : AVAILABLE_BACKGROUNDS.slice(0, 5)).map((bg) => {
                 const isSelected = selectedBackground === bg.url;
                 return (
                   <button
@@ -187,6 +235,25 @@ export const PomodoroSettingsDrawer: FC = () => {
                 );
               })}
             </div>
+
+            {AVAILABLE_BACKGROUNDS.length > 5 && (
+              <button
+                type="button"
+                onClick={() => setIsAllBackgroundsExpanded(!isAllBackgroundsExpanded)}
+                className="w-full mt-2 py-2 px-3 rounded-lg border border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#181513)] hover:bg-[var(--bg-surface-hover,#201c19)] text-[11px] font-medium text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f5f0e8)] flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+              >
+                <span>
+                  {isAllBackgroundsExpanded
+                    ? 'Ver menos wallpapers'
+                    : `Ver todos os wallpapers (${AVAILABLE_BACKGROUNDS.length})`}
+                </span>
+                <ChevronDown
+                  className={`w-3.5 h-3.5 transition-transform duration-200 ${
+                    isAllBackgroundsExpanded ? 'rotate-180' : ''
+                  }`}
+                />
+              </button>
+            )}
           </section>
 
           {/* ================= SECRET SECTION: FOTOS NO TIMER (NUNA) ================= */}

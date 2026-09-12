@@ -9,18 +9,22 @@ import SecretTimerPhotoTrigger from './components/Secret/SecretTimerPhotoTrigger
 import { ArrowLeft } from 'lucide-react';
 
 const PomodoroContent: FC = () => {
-  const { selectedBackground } = usePomodoroSettings();
+  const { selectedBackground, backgroundBlur } = usePomodoroSettings();
 
   return (
     <div className="relative min-h-[calc(100vh-4rem)] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] flex flex-col justify-start pb-3 px-4 transition-colors duration-300 overflow-x-hidden">
       
-      {/* 4K Crisp Background Layer - Hardware accelerated without any blur */}
+      {/* 4K Background Layer - With adjustable blur */}
       {selectedBackground && (
         <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
           <img
             src={selectedBackground}
             alt="Wallpaper Pomodoro"
-            className="w-full h-full object-cover object-center transform-gpu"
+            className="w-full h-full object-cover object-center transform-gpu transition-[filter,transform] duration-300"
+            style={{
+              filter: backgroundBlur > 0 ? `blur(${backgroundBlur}px)` : 'none',
+              transform: backgroundBlur > 0 ? 'scale(1.05)' : 'none',
+            }}
           />
           {/* Automatic darkening overlay for optimal contrast, focus and legibility */}
           <div className="absolute inset-0 bg-black/60 transition-opacity duration-300" />

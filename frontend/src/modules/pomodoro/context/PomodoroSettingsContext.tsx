@@ -317,6 +317,7 @@ const DEFAULT_SETTINGS = {
   buttonSoundsEnabled: true,
   isRealPomodoroMode: false,
   selectedBackground: null as string | null,
+  backgroundBlur: 0,
   ballSize: 480,
   selectedSongUrl: null as string | null,
   musicVolume: 40,
@@ -341,6 +342,8 @@ interface PomodoroSettingsContextType {
   setIsRealPomodoroMode: (enabled: boolean) => void;
   selectedBackground: string | null;
   setSelectedBackground: (bg: string | null) => void;
+  backgroundBlur: number;
+  setBackgroundBlur: (blur: number) => void;
   ballSize: number;
   setBallSize: (size: number) => void;
   selectedSongUrl: string | null;
@@ -521,6 +524,10 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
     setSettings((prev: typeof settings) => ({ ...prev, selectedBackground }));
   };
 
+  const setBackgroundBlur = (backgroundBlur: number) => {
+    setSettings((prev: typeof settings) => ({ ...prev, backgroundBlur }));
+  };
+
   const setBallSize = (ballSize: number) => {
     setSettings((prev: typeof settings) => ({ ...prev, ballSize }));
   };
@@ -615,6 +622,8 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
         setIsRealPomodoroMode,
         selectedBackground: settings.selectedBackground,
         setSelectedBackground,
+        backgroundBlur: settings.backgroundBlur ?? 0,
+        setBackgroundBlur,
         ballSize: settings.ballSize,
         setBallSize,
         selectedSongUrl: settings.selectedSongUrl,
