@@ -1,4 +1,4 @@
-# Enkephalos 🧠
+# Enkephalos
 
 Espaço de estudos minimalista, fluxo de anotações técnicas e gerenciador de foco com Pomodoro integrado.
 
@@ -6,7 +6,7 @@ Disponível em: **[enkephalos.mubadev.com.br](https://enkephalos.mubadev.com.br)
 
 ---
 
-## ✨ Funcionalidades
+## Funcionalidades
 
 - **Biblioteca de Estudos & Notas**: Visualização limpa de artigos e anotações técnicas (sincronizadas com Markdown do Obsidian), suporte a fórmulas matemáticas em KaTeX, blocos de código e links de navegação rápida por tópicos.
 - **Localizador Inteligente no Artigo (`Ctrl + K` / `Ctrl + F`)**: Busca estilo VS Code que destaca as ocorrências no texto com destaque natural por cor de fundo, compatibilidade com/sem acentos (`faisca` encontra `Faísca`) e navegação palavra por palavra (`Enter` / `Shift+Enter`).
@@ -18,7 +18,7 @@ Disponível em: **[enkephalos.mubadev.com.br](https://enkephalos.mubadev.com.br)
 
 ---
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 - **Frontend**: [React 19](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/), [Tailwind CSS v4](https://tailwindcss.com/), [KaTeX](https://katex.org/), [Lucide Icons](https://lucide.dev/)
 - **Backend**: [Java 21](https://www.oracle.com/java/), [Spring Boot](https://spring.io/projects/spring-boot), [Maven](https://maven.apache.org/)
@@ -26,7 +26,7 @@ Disponível em: **[enkephalos.mubadev.com.br](https://enkephalos.mubadev.com.br)
 
 ---
 
-## 🚀 Como Executar Localmente
+## Como Executar Localmente
 
 ### Opção 1: Desenvolvimento com Node.js
 
@@ -60,7 +60,7 @@ docker compose up -d --build
 
 ---
 
-## 🌐 Deploy em Produção
+## Deploy em Produção
 
 O projeto conta com pipeline de **CI/CD contínua** via GitHub Actions ([`.github/workflows/deploy.yml`](.github/workflows/deploy.yml)).
 
@@ -68,6 +68,6 @@ A cada `git push` na branch `main`, o GitHub conecta automaticamente na VPS via 
 
 ---
 
-## 📄 Licença
+## Licença
 
 Projeto desenvolvido para estudos e organização pessoal de conhecimento.
