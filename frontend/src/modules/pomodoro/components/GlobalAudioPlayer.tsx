@@ -67,6 +67,9 @@ export const GlobalAudioPlayer: FC = () => {
       setSelectedAmbientUrl(null);
     } else {
       setSelectedAmbientUrl(RAIN_AUDIO_URL);
+      if (ambientVolume === 0) {
+        setAmbientVolume(40);
+      }
     }
   };
 
@@ -146,10 +149,15 @@ export const GlobalAudioPlayer: FC = () => {
 
             {/* Rain Status Pill */}
             {selectedAmbientUrl && (
-              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              <button
+                type="button"
+                onClick={handleToggleRain}
+                className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors cursor-pointer"
+                title="Desabilitar som de chuva"
+              >
                 <CloudRain className="w-2.5 h-2.5" />
                 <span>Chuva {ambientVolume}%</span>
-              </span>
+              </button>
             )}
           </div>
 
@@ -224,23 +232,38 @@ export const GlobalAudioPlayer: FC = () => {
         {/* Rain Controls (Always accessible in player) */}
         <div className="p-2 rounded-lg bg-[var(--bg-color,#121110)]/70 border border-[var(--border-subtle,#2d2723)] space-y-1.5">
           <div className="flex items-center justify-between text-[10px]">
+            <div className="flex items-center gap-1.5 font-medium">
+              <CloudRain className={`w-3.5 h-3.5 ${selectedAmbientUrl ? 'text-blue-400' : 'text-zinc-500'}`} />
+              <span className={selectedAmbientUrl ? 'text-[var(--text-main,#f3f0ea)]' : 'text-[var(--text-muted,#9e9589)]'}>
+                Som de Chuva
+              </span>
+              {selectedAmbientUrl && (
+                <span className="text-blue-400 font-semibold tabular-nums">
+                  {ambientVolume}%
+                </span>
+              )}
+            </div>
+
+            {/* Switch Toggle Button */}
             <button
               type="button"
               onClick={handleToggleRain}
-              className={`font-medium flex items-center gap-1 transition-colors cursor-pointer ${
-                selectedAmbientUrl ? 'text-blue-400' : 'text-[var(--text-muted,#9e9589)]'
+              className={`relative inline-flex h-5 w-9 shrink-0 items-center rounded-full transition-colors cursor-pointer ${
+                selectedAmbientUrl
+                  ? 'bg-blue-500'
+                  : 'bg-zinc-700 hover:bg-zinc-600'
               }`}
+              title={selectedAmbientUrl ? 'Desabilitar som de chuva' : 'Habilitar som de chuva'}
+              aria-label={selectedAmbientUrl ? 'Desabilitar som de chuva' : 'Habilitar som de chuva'}
             >
-              <CloudRain className="w-3 h-3" />
-              <span>Som de Chuva</span>
-              <span className="text-[9px] px-1 py-0.2 rounded bg-white/5">
-                {selectedAmbientUrl ? 'Ativo' : 'Desligado'}
-              </span>
+              <span
+                className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow-sm transition-transform ${
+                  selectedAmbientUrl ? 'translate-x-4.5' : 'translate-x-1'
+                }`}
+              />
             </button>
-            <span className="text-blue-400 font-semibold tabular-nums">
-              {selectedAmbientUrl ? `${ambientVolume}%` : '0%'}
-            </span>
           </div>
+
           {selectedAmbientUrl && (
             <input
               type="range"
