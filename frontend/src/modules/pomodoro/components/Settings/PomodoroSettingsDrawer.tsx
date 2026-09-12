@@ -127,17 +127,22 @@ export const PomodoroSettingsDrawer: FC = () => {
 
           {/* Drawer Panel */}
           <div
-            className={`fixed top-0 right-0 h-full w-full sm:w-[450px] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] z-[9999] shadow-2xl border-l border-[var(--border-subtle,#26211e)] flex flex-col transform transition-all duration-300 ease-in-out ${
+            className={`fixed top-0 right-0 h-full w-full sm:w-[450px] max-w-[100vw] sm:max-w-[450px] bg-[var(--bg-color,#121110)] text-[var(--text-main,#f3f0ea)] z-[9999] shadow-2xl border-l border-[var(--border-subtle,#26211e)] flex flex-col overflow-hidden box-border transform transition-all duration-300 ease-in-out ${
               isSettingsOpen ? 'translate-x-0 opacity-100 pointer-events-auto' : 'translate-x-full opacity-0 pointer-events-none'
             }`}
+            style={{
+              width: 'min(100vw, 450px)',
+              maxWidth: '100vw',
+              boxSizing: 'border-box',
+            }}
           >
         {/* Drawer Header - Clean typography without icon clutter */}
-        <div className="flex items-center justify-between px-6 py-5 border-b border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)]/70">
-          <div>
-            <h3 className="font-['Raleway',sans-serif] text-sm font-bold tracking-wider uppercase text-[var(--text-main,#f3f0ea)]">
+        <div className="flex items-center justify-between px-4 sm:px-6 py-4 sm:py-5 border-b border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)]/70 shrink-0">
+          <div className="min-w-0 flex-1 mr-2">
+            <h3 className="font-['Raleway',sans-serif] text-sm font-bold tracking-wider uppercase text-[var(--text-main,#f3f0ea)] truncate">
               Configurações
             </h3>
-            <p className="text-[11px] font-['Lexend',sans-serif] text-[var(--text-dimmed,#78716c)]">
+            <p className="text-[11px] font-['Lexend',sans-serif] text-[var(--text-dimmed,#78716c)] truncate">
               Pomodoro, ambiente e preferências
             </p>
           </div>
@@ -145,7 +150,7 @@ export const PomodoroSettingsDrawer: FC = () => {
           <button
             type="button"
             onClick={() => setIsSettingsOpen(false)}
-            className="p-1.5 rounded-md text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-[var(--bg-surface-hover,#221d19)] transition-colors cursor-pointer"
+            className="p-1.5 rounded-md text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-[var(--bg-surface-hover,#221d19)] transition-colors cursor-pointer shrink-0"
             title="Fechar"
           >
             <X className="w-5 h-5" />
@@ -153,7 +158,7 @@ export const PomodoroSettingsDrawer: FC = () => {
         </div>
 
         {/* Single Main Scroll Body with Sleek Custom Scrollbar (NO inner sub-scrollbars) */}
-        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-7 custom-scrollbar text-xs font-['Lexend',sans-serif]">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden px-4 sm:px-6 py-5 sm:py-6 space-y-6 sm:space-y-7 custom-scrollbar text-xs font-['Lexend',sans-serif] min-w-0">
           
           {/* ================= SOM DE CHUVA ================= */}
           <section className="space-y-3">
@@ -842,20 +847,20 @@ export const PomodoroSettingsDrawer: FC = () => {
         </div>
 
         {/* Drawer Footer with Reset Button */}
-        <div className="p-4 border-t border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)]/60 flex items-center justify-between">
+        <div className="p-3.5 sm:p-4 border-t border-[var(--border-subtle,#26211e)] bg-[var(--bg-surface,#171412)]/60 flex items-center justify-between gap-2 shrink-0">
           <button
             type="button"
             onClick={resetSettings}
-            className="flex items-center gap-1.5 text-xs text-[var(--text-dimmed,#78716c)] hover:text-[var(--text-main,#f3f0ea)] transition-colors cursor-pointer"
+            className="flex items-center gap-1.5 text-xs text-[var(--text-dimmed,#78716c)] hover:text-[var(--text-main,#f3f0ea)] transition-colors cursor-pointer shrink-0 truncate"
           >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Restaurar padrões</span>
+            <RotateCcw className="w-3.5 h-3.5 shrink-0" />
+            <span className="truncate">Restaurar padrões</span>
           </button>
 
           <button
             type="button"
             onClick={() => setIsSettingsOpen(false)}
-            className="px-4 py-1.5 rounded-md bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] text-xs font-semibold hover:bg-[var(--accent-hover,#fbbf24)] transition-colors cursor-pointer shadow-sm"
+            className="px-4 py-1.5 rounded-md bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] text-xs font-semibold hover:bg-[var(--accent-hover,#fbbf24)] transition-colors cursor-pointer shadow-sm shrink-0"
           >
             Concluir
           </button>

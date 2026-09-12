@@ -133,7 +133,7 @@ export const GlobalAudioPlayer: FC = () => {
 
   // Expanded Mini Player Card
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-5 sm:right-6 z-50 w-[calc(100vw-2rem)] sm:w-84 max-w-[340px] animate-in fade-in slide-in-from-bottom-4 duration-200">
+    <div className="fixed bottom-3 right-3 left-3 sm:left-auto sm:bottom-5 sm:right-6 z-50 w-auto sm:w-84 max-w-[340px] ml-auto animate-in fade-in slide-in-from-bottom-4 duration-200">
       <div className="bg-[var(--bg-surface,#181513)]/95 border border-[var(--border-subtle,#2d2723)] backdrop-blur-xl rounded-2xl p-3.5 shadow-2xl text-[var(--text-main,#f3f0ea)] font-['Lexend',sans-serif] space-y-3">
         
         {/* Top Header Bar */}
