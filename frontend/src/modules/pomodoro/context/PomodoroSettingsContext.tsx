@@ -86,6 +86,66 @@ export const AVAILABLE_BACKGROUNDS: BackgroundOption[] = [
     title: 'Raya Lucaria (4K)',
     url: '/backgrounds/back3.jpeg',
   },
+  {
+    id: 'gotham-4k',
+    title: 'Gotham City (4K)',
+    url: '/backgrounds/479748-3840x2160-desktop-4k-gotham-city-wallpaper-image.jpg',
+  },
+  {
+    id: 'gotham-1080p',
+    title: 'Gotham City (1080p)',
+    url: '/backgrounds/479827-1920x1080-desktop-1080p-gotham-city-wallpaper-photo.jpg',
+  },
+  {
+    id: 'gotham1',
+    title: 'Gotham City Skyline',
+    url: '/backgrounds/gotham1.jpg',
+  },
+  {
+    id: 'fallen-knight',
+    title: 'Fallen Knight (Blossom Field)',
+    url: '/backgrounds/Fallen knight blossom field.jpeg',
+  },
+  {
+    id: 'knight1',
+    title: 'Cavaleiro Negro I',
+    url: '/backgrounds/knight1.jpg',
+  },
+  {
+    id: 'knight2',
+    title: 'Cavaleiro Negro II',
+    url: '/backgrounds/knight2.png',
+  },
+  {
+    id: 'celtic',
+    title: 'Celtic Forest',
+    url: '/backgrounds/celtic.jpg',
+  },
+  {
+    id: 'forest1',
+    title: 'Floresta Mágica',
+    url: '/backgrounds/forest1.jpg',
+  },
+  {
+    id: 'fantasy',
+    title: 'Fantasy Realm (4K)',
+    url: '/backgrounds/fantasy.jpg',
+  },
+  {
+    id: 'fantasy-minecraft',
+    title: 'Fantasy Minecraft',
+    url: '/backgrounds/fantasyminecraft.jpg',
+  },
+  {
+    id: 'hogwarts',
+    title: 'Hogwarts Castle',
+    url: '/backgrounds/hoggwarts.jpg',
+  },
+  {
+    id: 'hogwarts-night',
+    title: 'Hogwarts at Night (4K)',
+    url: '/backgrounds/hoggwartsatnight.png',
+  },
 ];
 
 export const RAIN_AUDIO_URL = '/ambient/rain.mp3';
@@ -100,6 +160,7 @@ export const AVAILABLE_AMBIENTS: AmbientOption[] = [
 ];
 
 export const AVAILABLE_SONGS: SongOption[] = [
+  // Lofi
   {
     id: 'lofi-dreamland',
     title: 'In Dreamland',
@@ -118,6 +179,20 @@ export const AVAILABLE_SONGS: SongOption[] = [
     category: 'Lofi',
     url: "/songs/lofi/[no copyright music] 'little break' lofi background music.mp3",
   },
+  {
+    id: 'lofi-532pm',
+    title: '5:32 PM (The Deli)',
+    category: 'Lofi',
+    url: '/songs/lofi/The Deli - 5_32PM.mp3',
+  },
+  {
+    id: 'lofi-kudasai',
+    title: "The Girl I Haven't Met (Kudasai)",
+    category: 'Lofi',
+    url: "/songs/lofi/kudasaibeats - the girl i haven't met.mp3",
+  },
+
+  // Øneheart
   {
     id: 'oneheart-apathy',
     title: 'Apathy',
@@ -153,6 +228,64 @@ export const AVAILABLE_SONGS: SongOption[] = [
     title: 'Her Eyes',
     category: 'Øneheart',
     url: '/songs/oneheart/øneheart - her eyes.mp3',
+  },
+
+  // Celtic
+  {
+    id: 'celtic-riverdance',
+    title: 'Riverdance',
+    category: 'Celtic',
+    url: '/songs/celtic/01 Riverdance - The Best of Celtic Music.mp3',
+  },
+  {
+    id: 'celtic-love-song',
+    title: 'Celtic Love Song',
+    category: 'Celtic',
+    url: '/songs/celtic/Celtic  Emotional Music - Celtic Love Song.mp3',
+  },
+  {
+    id: 'celtic-daydream',
+    title: 'Daydream Melody',
+    category: 'Celtic',
+    url: '/songs/celtic/Celtic Music - Daydream Melody.mp3',
+  },
+  {
+    id: 'celtic-guardians',
+    title: 'Guardians Of The Woods',
+    category: 'Celtic',
+    url: '/songs/celtic/Celtic Music - Guardians Of The Woods.mp3',
+  },
+  {
+    id: 'celtic-land-free',
+    title: 'Land of the Free',
+    category: 'Celtic',
+    url: '/songs/celtic/Celtic Music - Land of the Free.mp3',
+  },
+
+  // Jazz
+  {
+    id: 'jazz-alive',
+    title: 'Alive (Jazz Funk)',
+    category: 'Jazz',
+    url: '/songs/jazz/Alive - Jazz Funk  Independent Royalty Free Music by Danya Vodovoz.mp3',
+  },
+  {
+    id: 'jazz-fourtwentyone',
+    title: 'Fourtwentyone',
+    category: 'Jazz',
+    url: '/songs/jazz/Fourtwentyone.mp3',
+  },
+  {
+    id: 'jazz-integration',
+    title: 'Integration Loops (Pt. 1)',
+    category: 'Jazz',
+    url: '/songs/jazz/Integration Loops pt1.mp3',
+  },
+  {
+    id: 'jazz-funk-soul',
+    title: 'Jazz Funk My Soul',
+    category: 'Jazz',
+    url: '/songs/jazz/Jazz Funk my Soul.mp3',
   },
 ];
 
