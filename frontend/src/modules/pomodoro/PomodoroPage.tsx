@@ -5,6 +5,7 @@ import { PomodoroSettingsProvider, usePomodoroSettings } from './context/Pomodor
 import Header from './components/Header/Header';
 import Homepage from './components/Homepage/Homepage';
 import PomodoroSettingsDrawer from './components/Settings/PomodoroSettingsDrawer';
+import SecretTimerPhotoTrigger from './components/Secret/SecretTimerPhotoTrigger';
 import { ArrowLeft, BookOpen } from 'lucide-react';
 
 const PomodoroContent: FC = () => {
@@ -30,6 +31,9 @@ const PomodoroContent: FC = () => {
 
       {/* Floating Settings Drawer Button & Panel */}
       <PomodoroSettingsDrawer />
+
+      {/* Secret Easter Egg Trigger in Bottom-Left Corner */}
+      <SecretTimerPhotoTrigger />
 
       {/* Content wrapper with higher z-index - elevated to fit completely within viewport */}
       <div className="relative z-10 flex flex-col flex-1 justify-start">

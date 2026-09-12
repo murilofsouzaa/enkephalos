@@ -32,6 +32,34 @@ export interface AmbientOption {
   url: string | null;
 }
 
+export interface TimerPhotoOption {
+  id: string;
+  title: string;
+  subtitle: string;
+  url: string;
+}
+
+export const AVAILABLE_TIMER_PHOTOS: TimerPhotoOption[] = [
+  {
+    id: 'nuna-car',
+    title: 'Nuna & Murilo',
+    subtitle: 'Momento no carro',
+    url: '/backgrounds/timer/nuna/WhatsApp Image 2026-09-11 at 9.13.23 PM (1).jpeg',
+  },
+  {
+    id: 'nuna-mirror',
+    title: 'Nuna & Murilo',
+    subtitle: 'No espelho',
+    url: '/backgrounds/timer/nuna/WhatsApp Image 2026-09-11 at 9.13.23 PM (2).jpeg',
+  },
+  {
+    id: 'nuna-palace',
+    title: 'Nuna & Murilo',
+    subtitle: 'No palácio',
+    url: '/backgrounds/timer/nuna/WhatsApp Image 2026-09-11 at 9.13.23 PM.jpeg',
+  },
+];
+
 export const AVAILABLE_BACKGROUNDS: BackgroundOption[] = [
   {
     id: 'tlou-ellie',
@@ -161,6 +189,8 @@ const DEFAULT_SETTINGS = {
   musicVolume: 40,
   selectedAmbientUrl: null as string | null,
   ambientVolume: 50,
+  selectedTimerPhoto: null as string | null,
+  isSecretPhotosUnlocked: false,
 };
 
 const STORAGE_KEY = 'enkephalos_pomodoro_settings_v2';
@@ -194,6 +224,11 @@ interface PomodoroSettingsContextType {
   isAmbientPlaying: boolean;
   setIsAmbientPlaying: (playing: boolean) => void;
   toggleAmbientPlaying: () => void;
+  selectedTimerPhoto: string | null;
+  setSelectedTimerPhoto: (url: string | null) => void;
+  isSecretPhotosUnlocked: boolean;
+  setIsSecretPhotosUnlocked: (unlocked: boolean) => void;
+  toggleSecretPhotosUnlocked: () => void;
   isSettingsOpen: boolean;
   setIsSettingsOpen: (open: boolean) => void;
   playButtonSound: (audioSrc: string) => void;
@@ -399,6 +434,21 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
     setIsAmbientPlaying((prev) => !prev);
   };
 
+  const setSelectedTimerPhoto = (selectedTimerPhoto: string | null) => {
+    setSettings((prev: typeof settings) => ({ ...prev, selectedTimerPhoto }));
+  };
+
+  const setIsSecretPhotosUnlocked = (isSecretPhotosUnlocked: boolean) => {
+    setSettings((prev: typeof settings) => ({ ...prev, isSecretPhotosUnlocked }));
+  };
+
+  const toggleSecretPhotosUnlocked = () => {
+    setSettings((prev: typeof settings) => ({
+      ...prev,
+      isSecretPhotosUnlocked: !prev.isSecretPhotosUnlocked,
+    }));
+  };
+
   const playButtonSound = (audioSrc: string) => {
     if (!settings.buttonSoundsEnabled) return;
     try {
@@ -448,6 +498,11 @@ export const PomodoroSettingsProvider: FC<{ children: ReactNode }> = ({ children
         isAmbientPlaying,
         setIsAmbientPlaying,
         toggleAmbientPlaying,
+        selectedTimerPhoto: settings.selectedTimerPhoto,
+        setSelectedTimerPhoto,
+        isSecretPhotosUnlocked: settings.isSecretPhotosUnlocked,
+        setIsSecretPhotosUnlocked,
+        toggleSecretPhotosUnlocked,
         isSettingsOpen,
         setIsSettingsOpen,
         playButtonSound,

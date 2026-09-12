@@ -7,6 +7,7 @@ import {
   Pause,
   RotateCcw,
   Check,
+  Heart,
 } from 'lucide-react';
 import {
   usePomodoroSettings,
@@ -14,6 +15,7 @@ import {
   RAIN_AUDIO_URL,
   AVAILABLE_SONGS,
   COLOR_PRESETS,
+  AVAILABLE_TIMER_PHOTOS,
 } from '../../context/PomodoroSettingsContext';
 
 export const PomodoroSettingsDrawer: FC = () => {
@@ -40,6 +42,9 @@ export const PomodoroSettingsDrawer: FC = () => {
     setSelectedAmbientUrl,
     ambientVolume,
     setAmbientVolume,
+    selectedTimerPhoto,
+    setSelectedTimerPhoto,
+    isSecretPhotosUnlocked,
     isSettingsOpen,
     setIsSettingsOpen,
     resetSettings,
@@ -261,6 +266,80 @@ export const PomodoroSettingsDrawer: FC = () => {
               })}
             </div>
           </section>
+
+          {/* ================= SECRET SECTION: FOTOS NO TIMER (NUNA) ================= */}
+          {isSecretPhotosUnlocked && (
+            <section className="space-y-3 p-3.5 rounded-xl border border-rose-500/40 bg-[var(--bg-surface,#181513)] shadow-sm">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5">
+                  <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500 shrink-0" />
+                  <h4 className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-main,#141210)] font-['Lexend',sans-serif]">
+                    Para meu amorzinho, Nuna
+                  </h4>
+                </div>
+                <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/15 px-2 py-0.5 rounded-full">
+                  Especial ❤️
+                </span>
+              </div>
+              <p className="text-[11px] text-[var(--text-muted,#6c635a)] leading-tight">
+                Substitui o líquido do timer por uma foto especial nossa.
+              </p>
+
+              <div className="grid grid-cols-2 gap-2 pt-1">
+                {/* Opção Líquido Normal */}
+                <button
+                  type="button"
+                  onClick={() => setSelectedTimerPhoto(null)}
+                  className={`relative h-20 rounded-lg border flex flex-col items-center justify-center p-2 text-center transition-all cursor-pointer overflow-hidden ${
+                    selectedTimerPhoto === null
+                      ? 'border-rose-500 ring-2 ring-rose-500/40 shadow-sm bg-[var(--bg-surface-hover,#f0ebe2)]'
+                      : 'border-[var(--border-subtle,#26211e)] hover:border-[var(--text-muted)] bg-[var(--bg-surface,#181513)]'
+                  }`}
+                >
+                  <span className="text-xs font-semibold text-[var(--text-main,#141210)]">
+                    Líquido Normal
+                  </span>
+                  <span className="text-[10px] text-[var(--text-dimmed,#78716c)]">
+                    (Sem foto)
+                  </span>
+                  {selectedTimerPhoto === null && (
+                    <div className="absolute top-1.5 right-1.5 w-3.5 h-3.5 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-sm">
+                      <Check className="w-2.5 h-2.5 stroke-[3]" />
+                    </div>
+                  )}
+                </button>
+
+                {/* Fotos Especiais sem texto por cima */}
+                {AVAILABLE_TIMER_PHOTOS.map((photo) => {
+                  const isSelected = selectedTimerPhoto === photo.url;
+                  return (
+                    <button
+                      key={photo.id}
+                      type="button"
+                      onClick={() => setSelectedTimerPhoto(photo.url)}
+                      title={photo.title}
+                      className={`relative h-20 rounded-lg border transition-all cursor-pointer overflow-hidden group ${
+                        isSelected
+                          ? 'border-rose-500 ring-2 ring-rose-500/50 shadow-md scale-[1.02]'
+                          : 'border-[var(--border-subtle,#26211e)] hover:border-[var(--text-muted)]'
+                      }`}
+                    >
+                      <img
+                        src={photo.url}
+                        alt="Foto especial"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                      {isSelected && (
+                        <div className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-rose-500 text-white flex items-center justify-center shadow-md">
+                          <Check className="w-2.5 h-2.5 stroke-[3]" />
+                        </div>
+                      )}
+                    </button>
+                  );
+                })}
+              </div>
+            </section>
+          )}
 
           {/* ================= SECTION 3: LIQUID COLORS PER MODE ================= */}
           <section className="space-y-3">
