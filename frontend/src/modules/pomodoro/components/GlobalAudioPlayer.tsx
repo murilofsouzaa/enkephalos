@@ -12,7 +12,7 @@ import {
   ChevronUp,
   Timer,
   CloudRain,
-  Disc3,
+  Headphones,
 } from 'lucide-react';
 import {
   usePomodoroSettings,
@@ -36,8 +36,8 @@ export const GlobalAudioPlayer: FC = () => {
     setAmbientVolume,
   } = usePomodoroSettings();
 
-  const [isMinimized, setIsMinimized] = useState(false);
-  const [showRainControls, setShowRainControls] = useState(false);
+  // Player contraído por padrão como na imagem
+  const [isMinimized, setIsMinimized] = useState(true);
   const [prevMusicVolume, setPrevMusicVolume] = useState(musicVolume || 40);
 
   const location = useLocation();
@@ -70,20 +70,21 @@ export const GlobalAudioPlayer: FC = () => {
     }
   };
 
-  // Minimized Floating Pill View
+  // Minimized Floating View (Contraído por padrão com borda menos redonda rounded-xl, sem controles de volume)
   if (isMinimized) {
     return (
-      <div className="fixed bottom-4 right-4 z-50 animate-in fade-in slide-in-from-bottom-3 duration-200">
-        <div className="flex items-center gap-2.5 px-3 py-2 bg-[var(--bg-surface,#181513)]/95 border border-[var(--border-subtle,#2d2723)] backdrop-blur-md rounded-full shadow-xl text-[var(--text-main,#f3f0ea)] font-['Lexend',sans-serif]">
+      <div className="fixed bottom-3 right-3 sm:bottom-4 sm:right-5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-200">
+        <div className="flex items-center gap-2.5 px-3 py-2 bg-[var(--bg-surface,#181513)]/95 border border-[var(--border-subtle,#2d2723)] backdrop-blur-md rounded-xl shadow-xl text-[var(--text-main,#f3f0ea)] font-['Lexend',sans-serif]">
+          {/* Headphones Icon & Track Title */}
           <button
             type="button"
             onClick={() => setIsMinimized(false)}
             className="flex items-center gap-2 text-left cursor-pointer group"
             title="Expandir player"
           >
-            <Disc3
+            <Headphones
               className={`w-4 h-4 text-[var(--accent-color,#f59e0b)] shrink-0 ${
-                isMusicPlaying ? 'animate-spin [animation-duration:3s]' : ''
+                isMusicPlaying ? 'animate-pulse' : 'opacity-80'
               }`}
             />
             <span className="text-xs font-medium max-w-[120px] sm:max-w-[160px] truncate group-hover:text-[var(--accent-color,#f59e0b)] transition-colors">
@@ -97,7 +98,7 @@ export const GlobalAudioPlayer: FC = () => {
           <button
             type="button"
             onClick={toggleMusicPlaying}
-            className="w-6 h-6 rounded-full bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform cursor-pointer"
+            className="w-6 h-6 rounded-lg bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform cursor-pointer"
             title={isMusicPlaying ? 'Pausar' : 'Tocar'}
           >
             {isMusicPlaying ? (
@@ -112,7 +113,7 @@ export const GlobalAudioPlayer: FC = () => {
             type="button"
             onClick={() => setIsMinimized(false)}
             className="p-1 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] transition-colors cursor-pointer"
-            title="Expandir mini player"
+            title="Expandir player"
           >
             <ChevronUp className="w-3.5 h-3.5" />
           </button>
@@ -131,29 +132,24 @@ export const GlobalAudioPlayer: FC = () => {
     );
   }
 
-  // Expanded Mini Player Card
+  // Expanded View (Bordas menos redondas rounded-xl)
   return (
     <div className="fixed bottom-3 right-3 left-3 sm:left-auto sm:bottom-5 sm:right-6 z-50 w-auto sm:w-84 max-w-[340px] ml-auto animate-in fade-in slide-in-from-bottom-4 duration-200">
-      <div className="bg-[var(--bg-surface,#181513)]/95 border border-[var(--border-subtle,#2d2723)] backdrop-blur-xl rounded-2xl p-3.5 shadow-2xl text-[var(--text-main,#f3f0ea)] font-['Lexend',sans-serif] space-y-3">
+      <div className="bg-[var(--bg-surface,#181513)]/95 border border-[var(--border-subtle,#2d2723)] backdrop-blur-xl rounded-xl p-3.5 shadow-2xl text-[var(--text-main,#f3f0ea)] font-['Lexend',sans-serif] space-y-3">
         
         {/* Top Header Bar */}
         <div className="flex items-center justify-between gap-2">
           <div className="flex items-center gap-1.5">
-            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full bg-[var(--accent-muted,rgba(245,158,11,0.12))] text-[var(--accent-color,#f59e0b)] border border-[var(--accent-color,#f59e0b)]/20">
+            <span className="text-[10px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-md bg-[var(--accent-muted,rgba(245,158,11,0.12))] text-[var(--accent-color,#f59e0b)] border border-[var(--accent-color,#f59e0b)]/20">
               {songCategory}
             </span>
 
-            {/* Quick Rain Status Pill */}
+            {/* Rain Status Pill */}
             {selectedAmbientUrl && (
-              <button
-                type="button"
-                onClick={() => setShowRainControls(!showRainControls)}
-                className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 hover:bg-blue-500/20 transition-colors cursor-pointer"
-                title="Ajustar som de chuva"
-              >
+              <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20">
                 <CloudRain className="w-2.5 h-2.5" />
-                <span>Chuva</span>
-              </button>
+                <span>Chuva {ambientVolume}%</span>
+              </span>
             )}
           </div>
 
@@ -175,7 +171,7 @@ export const GlobalAudioPlayer: FC = () => {
               type="button"
               onClick={() => setIsMinimized(true)}
               className="p-1.5 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] transition-colors rounded-md hover:bg-white/5 cursor-pointer"
-              title="Minimizar"
+              title="Contrair player"
             >
               <ChevronDown className="w-3.5 h-3.5" />
             </button>
@@ -194,19 +190,16 @@ export const GlobalAudioPlayer: FC = () => {
 
         {/* Middle Track Info */}
         <div className="flex items-center gap-3">
-          {/* Vinyl / Equalizer Avatar */}
-          <div className="relative w-11 h-11 rounded-xl bg-[var(--bg-color,#121110)] border border-[var(--border-subtle,#2d2723)] flex items-center justify-center shrink-0 overflow-hidden group">
-            <Disc3
-              className={`w-6 h-6 text-[var(--accent-color,#f59e0b)] ${
-                isMusicPlaying ? 'animate-spin [animation-duration:4s]' : 'opacity-80'
+          {/* Headphones Icon Avatar */}
+          <div className="relative w-11 h-11 rounded-lg bg-[var(--bg-color,#121110)] border border-[var(--border-subtle,#2d2723)] flex items-center justify-center shrink-0 overflow-hidden">
+            <Headphones
+              className={`w-5 h-5 text-[var(--accent-color,#f59e0b)] ${
+                isMusicPlaying ? 'animate-pulse' : 'opacity-80'
               }`}
             />
-            {isMusicPlaying && (
-              <div className="absolute inset-0 bg-radial from-transparent to-black/30 pointer-events-none" />
-            )}
           </div>
 
-          {/* Title & Artist */}
+          {/* Title & Status */}
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold text-[var(--text-main,#f3f0ea)] truncate leading-tight">
               {songTitle}
@@ -228,101 +221,100 @@ export const GlobalAudioPlayer: FC = () => {
           </div>
         </div>
 
-        {/* Rain Controls Flyout (if active and toggled) */}
-        {showRainControls && selectedAmbientUrl && (
-          <div className="p-2 rounded-xl bg-[var(--bg-color,#121110)]/70 border border-blue-500/20 space-y-1.5 animate-in fade-in duration-150">
-            <div className="flex items-center justify-between text-[10px]">
-              <span className="text-blue-300 font-medium flex items-center gap-1">
-                <CloudRain className="w-3 h-3" /> Volume Chuva
+        {/* Rain Controls (Always accessible in player) */}
+        <div className="p-2 rounded-lg bg-[var(--bg-color,#121110)]/70 border border-[var(--border-subtle,#2d2723)] space-y-1.5">
+          <div className="flex items-center justify-between text-[10px]">
+            <button
+              type="button"
+              onClick={handleToggleRain}
+              className={`font-medium flex items-center gap-1 transition-colors cursor-pointer ${
+                selectedAmbientUrl ? 'text-blue-400' : 'text-[var(--text-muted,#9e9589)]'
+              }`}
+            >
+              <CloudRain className="w-3 h-3" />
+              <span>Som de Chuva</span>
+              <span className="text-[9px] px-1 py-0.2 rounded bg-white/5">
+                {selectedAmbientUrl ? 'Ativo' : 'Desligado'}
               </span>
-              <span className="text-blue-400 font-semibold">{ambientVolume}%</span>
-            </div>
+            </button>
+            <span className="text-blue-400 font-semibold tabular-nums">
+              {selectedAmbientUrl ? `${ambientVolume}%` : '0%'}
+            </span>
+          </div>
+          {selectedAmbientUrl && (
             <input
               type="range"
               min="0"
               max="100"
               value={ambientVolume}
               onChange={(e) => setAmbientVolume(Number(e.target.value))}
-              className="w-full h-1 accent-blue-400 bg-zinc-700 rounded-lg cursor-pointer"
+              className="w-full h-1 accent-blue-400 bg-zinc-700 rounded cursor-pointer"
             />
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* Bottom Playback & Volume Row */}
-        <div className="flex items-center justify-between gap-3 pt-0.5">
-          {/* Controls: Prev, Play/Pause, Next */}
-          <div className="flex items-center gap-1.5">
-            <button
-              type="button"
-              onClick={prevSong}
-              className="p-1.5 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
-              title="Música anterior"
-            >
-              <SkipBack className="w-3.5 h-3.5 fill-current" />
-            </button>
-
-            <button
-              type="button"
-              onClick={toggleMusicPlaying}
-              className="w-8 h-8 rounded-full bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shadow-md cursor-pointer"
-              title={isMusicPlaying ? 'Pausar' : 'Tocar'}
-            >
-              {isMusicPlaying ? (
-                <Pause className="w-3.5 h-3.5 fill-current" />
-              ) : (
-                <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
-              )}
-            </button>
-
-            <button
-              type="button"
-              onClick={nextSong}
-              className="p-1.5 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
-              title="Próxima música"
-            >
-              <SkipForward className="w-3.5 h-3.5 fill-current" />
-            </button>
-
-            {/* Rain Quick Toggle */}
-            <button
-              type="button"
-              onClick={handleToggleRain}
-              className={`p-1.5 rounded-lg transition-colors cursor-pointer ml-1 ${
-                selectedAmbientUrl
-                  ? 'text-blue-400 bg-blue-500/10 hover:bg-blue-500/20'
-                  : 'text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-white/5'
-              }`}
-              title={selectedAmbientUrl ? 'Desligar som de chuva' : 'Ligar som de chuva'}
-            >
-              <CloudRain className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Volume Control */}
-          <div className="flex items-center gap-1.5 flex-1 max-w-[110px]">
+        {/* Music Volume Control */}
+        <div className="p-2 rounded-lg bg-[var(--bg-color,#121110)]/70 border border-[var(--border-subtle,#2d2723)] space-y-1.5">
+          <div className="flex items-center justify-between text-[10px]">
             <button
               type="button"
               onClick={handleToggleMute}
-              className="p-1 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] transition-colors cursor-pointer shrink-0"
-              title={musicVolume === 0 ? 'Desmutar' : 'Mutar'}
+              className="text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] font-medium flex items-center gap-1 transition-colors cursor-pointer"
+              title={musicVolume === 0 ? "Ativar som" : "Mutar"}
             >
               {musicVolume === 0 ? (
-                <VolumeX className="w-3.5 h-3.5 text-zinc-500" />
+                <VolumeX className="w-3 h-3 text-zinc-500" />
               ) : (
-                <Volume2 className="w-3.5 h-3.5" />
+                <Volume2 className="w-3 h-3 text-[var(--accent-color,#f59e0b)]" />
               )}
+              <span>Volume da Música</span>
             </button>
-
-            <input
-              type="range"
-              min="0"
-              max="100"
-              value={musicVolume}
-              onChange={(e) => setMusicVolume(Number(e.target.value))}
-              className="w-full h-1 accent-[var(--accent-color,#f59e0b)] bg-zinc-700 rounded-lg cursor-pointer"
-              title={`Volume: ${musicVolume}%`}
-            />
+            <span className="text-[var(--accent-color,#f59e0b)] font-semibold tabular-nums">
+              {musicVolume}%
+            </span>
           </div>
+          <input
+            type="range"
+            min="0"
+            max="100"
+            value={musicVolume}
+            onChange={(e) => setMusicVolume(Number(e.target.value))}
+            className="w-full h-1 accent-[var(--accent-color,#f59e0b)] bg-zinc-700 rounded cursor-pointer"
+          />
+        </div>
+
+        {/* Playback Controls Row */}
+        <div className="flex items-center justify-center gap-3 pt-1">
+          <button
+            type="button"
+            onClick={prevSong}
+            className="p-2 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+            title="Música anterior"
+          >
+            <SkipBack className="w-4 h-4 fill-current" />
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleMusicPlaying}
+            className="w-9 h-9 rounded-lg bg-[var(--accent-color,#f59e0b)] text-[var(--bg-color,#121110)] flex items-center justify-center hover:scale-105 active:scale-95 transition-transform shadow-md cursor-pointer"
+            title={isMusicPlaying ? 'Pausar' : 'Tocar'}
+          >
+            {isMusicPlaying ? (
+              <Pause className="w-4 h-4 fill-current" />
+            ) : (
+              <Play className="w-4 h-4 fill-current ml-0.5" />
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={nextSong}
+            className="p-2 text-[var(--text-muted,#9e9589)] hover:text-[var(--text-main,#f3f0ea)] hover:bg-white/5 rounded-lg transition-colors cursor-pointer"
+            title="Próxima música"
+          >
+            <SkipForward className="w-4 h-4 fill-current" />
+          </button>
         </div>
 
       </div>
