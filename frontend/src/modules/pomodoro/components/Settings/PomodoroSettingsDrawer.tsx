@@ -79,7 +79,7 @@ export const PomodoroSettingsDrawer: FC = () => {
       <button
         type="button"
         onClick={() => setIsSettingsOpen(true)}
-        className="fixed right-3 sm:right-6 top-18 sm:top-24 z-30 p-2 sm:p-2.5 rounded-full bg-[var(--bg-surface,#181513)]/90 hover:bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--accent-color,#f59e0b)] border border-[var(--border-subtle,#26211e)] shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 cursor-pointer group"
+        className="fixed right-3 sm:right-6 top-20 sm:top-27 z-30 p-2 sm:p-2.5 rounded-full bg-[var(--bg-surface,#181513)]/90 hover:bg-[var(--bg-surface-hover,#221d19)] text-[var(--text-muted,#9e9589)] hover:text-[var(--accent-color,#f59e0b)] border border-[var(--border-subtle,#26211e)] shadow-lg backdrop-blur-md transition-all duration-300 hover:scale-105 cursor-pointer group"
         title="Configurações do Pomodoro"
         aria-label="Abrir configurações"
       >

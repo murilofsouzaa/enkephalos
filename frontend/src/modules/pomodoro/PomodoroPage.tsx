@@ -39,10 +39,10 @@ const PomodoroContent: FC = () => {
       <div className="relative z-10 flex flex-col flex-1 justify-start">
         
         {/* Top bar controls */}
-        <div className="max-w-4xl mx-auto w-full pt-2 sm:pt-4 pb-1 flex items-center justify-between gap-2">
+        <div className="max-w-4xl mx-auto w-full pt-4 sm:pt-7 pb-1 flex items-center justify-between gap-2 px-1">
           <Link
             to="/"
-            className={`inline-flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-['Lexend',sans-serif] transition-all px-2.5 sm:px-3.5 py-1.5 rounded-full shrink-0 ${
+            className={`inline-flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-['Lexend',sans-serif] transition-all px-3 sm:px-3.5 py-1.5 rounded-full shrink-0 ${
               selectedBackground
                 ? 'bg-black/45 hover:bg-black/70 text-white hover:text-[var(--accent-color,#f59e0b)] shadow-md backdrop-blur-md'
                 : 'bg-[var(--bg-surface,#181513)]/70 hover:bg-[var(--bg-surface)] text-[var(--text-main,#f3f0ea)] hover:text-[var(--accent-color,#f59e0b)]'
@@ -54,8 +54,8 @@ const PomodoroContent: FC = () => {
           </Link>
         </div>
 
-        {/* Centered Pomodoro Block: Mode Selector directly above the circular Timer */}
-        <div className="flex-1 flex flex-col justify-center items-center gap-3 sm:gap-5 py-2">
+        {/* Main Pomodoro Block: Mode Selector and Timer comfortably balanced, not too low and not too high */}
+        <div className="flex-1 flex flex-col justify-start items-center pt-6 sm:pt-10 gap-3 sm:gap-4 pb-8">
           <Header />
           <Homepage />
         </div>
