@@ -277,9 +277,6 @@ export const PomodoroSettingsDrawer: FC = () => {
                     Para meu amorzinho, Nuna
                   </h4>
                 </div>
-                <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/15 px-2 py-0.5 rounded-full">
-                  Especial ❤️
-                </span>
               </div>
               <p className="text-[11px] text-[var(--text-muted,#6c635a)] leading-tight">
                 Substitui o líquido do timer por uma foto especial nossa.
