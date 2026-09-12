@@ -257,3 +257,42 @@ mark.article-search-match[data-search-active="true"],
   transform: none !important;
   animation: none !important;
 }
+
+/* Responsive Timer Ball & Internal Typography */
+.timer-ball {
+  width: var(--ball-size-mobile);
+  height: var(--ball-size-mobile);
+}
+
+.timer-digits {
+  font-size: var(--timer-font-mobile);
+}
+
+.timer-label {
+  font-size: var(--label-font-mobile);
+}
+
+.timer-icon {
+  width: var(--icon-size-mobile);
+  height: var(--icon-size-mobile);
+}
+
+@media (min-width: 640px) {
+  .timer-ball {
+    width: var(--ball-size-desktop);
+    height: var(--ball-size-desktop);
+  }
+
+  .timer-digits {
+    font-size: var(--timer-font-desktop);
+  }
+
+  .timer-label {
+    font-size: var(--label-font-desktop);
+  }
+
+  .timer-icon {
+    width: var(--icon-size-desktop);
+    height: var(--icon-size-desktop);
+  }
+}

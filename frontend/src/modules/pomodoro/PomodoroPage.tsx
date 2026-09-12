@@ -6,7 +6,7 @@ import Header from './components/Header/Header';
 import Homepage from './components/Homepage/Homepage';
 import PomodoroSettingsDrawer from './components/Settings/PomodoroSettingsDrawer';
 import SecretTimerPhotoTrigger from './components/Secret/SecretTimerPhotoTrigger';
-import { ArrowLeft, BookOpen } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 
 const PomodoroContent: FC = () => {
   const { selectedBackground } = usePomodoroSettings();
@@ -35,7 +35,7 @@ const PomodoroContent: FC = () => {
       {/* Secret Easter Egg Trigger in Bottom-Left Corner */}
       <SecretTimerPhotoTrigger />
 
-      {/* Content wrapper with higher z-index - elevated to fit completely within viewport */}
+      {/* Content wrapper with higher z-index */}
       <div className="relative z-10 flex flex-col flex-1 justify-start">
         
         {/* Top bar controls */}
@@ -52,28 +52,11 @@ const PomodoroContent: FC = () => {
             <span className="font-medium tracking-wide hidden sm:inline">Voltar ao Hub Central</span>
             <span className="font-medium tracking-wide sm:hidden">Voltar</span>
           </Link>
-
-          <Link
-            to="/estudos"
-            className={`inline-flex items-center gap-1.5 sm:gap-2 text-[11px] sm:text-xs font-['Lexend',sans-serif] transition-all px-2.5 sm:px-3.5 py-1.5 rounded-full mr-10 sm:mr-14 shrink-0 ${
-              selectedBackground
-                ? 'bg-black/45 hover:bg-black/70 text-white hover:text-[var(--accent-color,#f59e0b)] shadow-md backdrop-blur-md'
-                : 'bg-[var(--bg-surface,#181513)]/70 hover:bg-[var(--bg-surface)] text-[var(--text-main,#f3f0ea)] hover:text-[var(--accent-color,#f59e0b)]'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5 text-[var(--accent-color,#f59e0b)] shrink-0" />
-            <span className="font-medium tracking-wide hidden sm:inline">Consultar Estudos</span>
-            <span className="font-medium tracking-wide sm:hidden">Estudos</span>
-          </Link>
         </div>
 
-        {/* Mode selector (Pomodoro / Short-Break / Long-Break) - moved down closer to timer */}
-        <div className="pt-3 sm:pt-5">
+        {/* Centered Pomodoro Block: Mode Selector directly above the circular Timer */}
+        <div className="flex-1 flex flex-col justify-center items-center gap-3 sm:gap-5 py-2">
           <Header />
-        </div>
-
-        {/* Circular Timer Main View - Kept in place without being pushed down */}
-        <div className="flex-1 flex flex-col justify-center items-center py-1 -mt-2 sm:-mt-3">
           <Homepage />
         </div>
       </div>

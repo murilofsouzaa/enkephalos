@@ -19,7 +19,7 @@ interface ButtonProps {
 }
 
 const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, setTimeLeft , isActive, TOTAL_SECONDS, isRealMode, mode = 'pomodoro'}: ButtonProps) => {
-    const { buttonSoundsEnabled, ballSize, timerDurations, setTimerDuration } = usePomodoroSettings();
+    const { buttonSoundsEnabled, timerDurations, setTimerDuration } = usePomodoroSettings();
     const [isEditingTime, setIsEditingTime] = useState(false);
     const editorRef = useRef<HTMLDivElement | null>(null);
     
@@ -84,11 +84,6 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
         setIsFirstTime(true);
         setTimeLeft(TOTAL_SECONDS);
     };
-
-    // Responsive font sizing based on ballSize and viewport constraints
-    const maxTimerSize = Math.max(48, Math.round((ballSize || 520) * 0.22));
-    const maxLabelSize = Math.max(12, Math.round((ballSize || 520) * 0.045));
-    const maxIconSize = Math.max(20, Math.round((ballSize || 520) * 0.065));
 
     return ( 
         <div className="z-10 flex flex-col justify-center items-center select-none pointer-events-auto max-w-[85%] text-center">
@@ -155,8 +150,7 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
                             setIsEditingTime(true);
                         }
                     }}
-                    className={`text-white font-bold leading-none tracking-tight ${isFirstTime ? 'cursor-pointer group/timer' : ''}`}
-                    style={{ fontSize: `clamp(2.25rem, min(18vw, 15vh), ${maxTimerSize}px)` }}
+                    className={`timer-digits text-white font-bold leading-none tracking-tight ${isFirstTime ? 'cursor-pointer group/timer' : ''}`}
                     title={isFirstTime ? 'Clique para ajustar o tempo' : undefined}
                 >
                     {isFirstTime ? (
@@ -177,8 +171,7 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
                         <>
                             <button
                                 type="button"
-                                style={{ fontSize: `clamp(0.65rem, min(3.8vw, 3.2vh), ${maxLabelSize}px)` }}
-                                className="font-['Raleway',sans-serif] font-bold tracking-widest text-white/90 cursor-pointer drop-shadow-md hover:text-white transition-colors"
+                                className="timer-label font-['Raleway',sans-serif] font-bold tracking-widest text-white/90 cursor-pointer drop-shadow-md hover:text-white transition-colors"
                             >
                                 CLICK TO START
                             </button>
@@ -220,16 +213,15 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
                         title={isActive ? "Pausar" : "Continuar"}
                     >
                         {!isActive ? (
-                            <Play className="w-5 h-5 sm:w-7 sm:h-7" style={{ maxWidth: `${maxIconSize}px`, maxHeight: `${maxIconSize}px` }} />
+                            <Play className="timer-icon" />
                         ) : (
-                            <Pause className="w-5 h-5 sm:w-7 sm:h-7" style={{ maxWidth: `${maxIconSize}px`, maxHeight: `${maxIconSize}px` }} />
+                            <Pause className="timer-icon" />
                         )}
                     </button>
                     
                     <button
                         type="button"
-                        style={{ fontSize: `clamp(0.65rem, min(3.8vw, 3.2vh), ${maxLabelSize}px)` }}
-                        className={`${!isFirstTime && "hidden"} font-['Raleway',sans-serif] font-bold tracking-widest text-white/90 cursor-pointer drop-shadow-md hover:text-white transition-colors`}
+                        className={`${!isFirstTime && "hidden"} timer-label font-['Raleway',sans-serif] font-bold tracking-widest text-white/90 cursor-pointer drop-shadow-md hover:text-white transition-colors`}
                     >
                         {!isActive && "CLICK TO START"}
                     </button>
@@ -243,7 +235,7 @@ const Button = ({ isFirstTime, minutes, seconds, setIsActive, setIsFirstTime, se
                             handleRestart(e);
                         }}
                     >
-                        <RotateCcw className="w-5 h-5 sm:w-7 sm:h-7" style={{ maxWidth: `${maxIconSize}px`, maxHeight: `${maxIconSize}px` }} />
+                        <RotateCcw className="timer-icon" />
                     </button>
                 </div>
             )}

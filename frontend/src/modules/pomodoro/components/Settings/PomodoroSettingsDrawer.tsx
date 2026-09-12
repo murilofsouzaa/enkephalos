@@ -551,7 +551,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                 Tamanho do Timer
               </h4>
               <span className="text-[11px] font-['Lexend',sans-serif] font-semibold text-[var(--accent-color,#f59e0b)]">
-                {ballSize}px
+                {ballSize <= 420 ? 'Pequeno' : ballSize <= 550 ? 'Médio' : 'Grande'} • {ballSize}px
               </span>
             </div>
 
@@ -563,6 +563,7 @@ export const PomodoroSettingsDrawer: FC = () => {
                 step="10"
                 value={ballSize}
                 onChange={(e) => setBallSize(Number(e.target.value))}
+                onInput={(e) => setBallSize(Number((e.target as HTMLInputElement).value))}
                 className="w-full accent-[var(--accent-color,#f59e0b)] cursor-pointer"
               />
 

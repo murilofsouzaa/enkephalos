@@ -2,6 +2,7 @@ import { useEffect } from 'react';
 import { useTimer } from '../../hooks/useTimer';
 import Button from '../../ui/Button';
 import { usePomodoroSettings } from '../../context/PomodoroSettingsContext';
+import { getTimerDimensions } from '../../utils/timerResponsive';
 
 const timerStart = '/timer-start.mp3';
 const pausedSound = '/timer-paused.mp3';
@@ -30,6 +31,8 @@ const PomodoroView = () => {
         isRealPomodoroMode,
         selectedTimerPhoto,
     } = usePomodoroSettings();
+
+    const timerDimensions = getTimerDimensions(ballSize);
 
     useEffect(() => {
         let timerId: ReturnType<typeof setInterval>;
@@ -113,10 +116,12 @@ const PomodoroView = () => {
                     }
                 }}
                 style={{
-                    width: `min(86vw, calc(100vh - 14.5rem), ${ballSize}px)`,
-                    height: `min(86vw, calc(100vh - 14.5rem), ${ballSize}px)`,
+                    ...timerDimensions.ballStyle,
+                    ...timerDimensions.timerFontSizeStyle,
+                    ...timerDimensions.labelFontSizeStyle,
+                    ...timerDimensions.iconSizeStyle,
                 }}
-                className="aspect-square relative overflow-hidden timer-subcontainer flex flex-col justify-center items-center bg-[var(--bg-color,#121110)] border-[8px] sm:border-[10px] border-[var(--timer-stroke,#eedfc8)] rounded-full hover:scale-[0.99] hover:cursor-pointer transition-all shadow-2xl"
+                className="timer-ball aspect-square relative overflow-hidden timer-subcontainer flex flex-col justify-center items-center bg-[var(--bg-color,#121110)] border-[8px] sm:border-[10px] border-[var(--timer-stroke,#eedfc8)] rounded-full hover:scale-[0.99] hover:cursor-pointer transition-all shadow-2xl"
             >
                 {/* Background inside ball: Photo or Liquid */}
                 {selectedTimerPhoto ? (
